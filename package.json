@@ -12,6 +12,7 @@
   "dependencies": {
     "circular-json": "^0.5.9",
     "discord.js": "^11.4.2",
-    "flat": "^4.1.0"
+    "flat": "^4.1.0",
+    "request": "2.81.0"
   }
 }
