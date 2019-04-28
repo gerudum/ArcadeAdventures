@@ -1,0 +1,386 @@
+{"Calibur":{
+"name":"Calibur",
+"damage":3,
+"damageType":"NORMAL",
+"special":5,
+"type":"Sword",
+"range":100,
+"description":"A standard issue sword awarded to Spiral Knights who have proven themselves in the field."
+},"Blaster":{
+"name":"Blaster",
+"damage":2,
+"damageType":"NORMAL",
+"special":4,
+"type":"Gun",
+"range":70,
+"description":"A versatile handgun issued to Spiral Knights who have proven themselves in the field."
+},"Autogun":{
+"name":"Autogun",
+"damage":1,
+"damageType":"NORMAL",
+"multihit":6,
+"chance":30,
+"special":4,
+"type":"Gun",
+"range":90,
+"description":"A fully automated handgun capable of rapidly firing powerful bolts of energy."  
+},"Needleshot":{
+"name":"Needleshot",
+"damage":2,
+"damageType":"PIERCING",
+"multihit":6,
+"chance":30,
+"special":4,
+"type":"Gun",
+"range":90,
+"description":"An Autogun modified to fire piercing bolts at an alarming rate.."  
+},"Blast":{
+"name":"BlastBomb",
+"damage":2,
+"damageType":"NORMAL",
+"special":0,
+"type":"Bomb",
+"description":"An all-purpose bomb issued to Spiral Knights who have proven themselves in the field."
+},"Brandish":{
+"name":"Brandish",
+"damage":4,
+"damageType":"NORMAL",
+"special":0,
+"type":"Sword",
+"range":100,
+"description":"An all-purpose bomb issued to Spiral Knights who have proven themselves in the field."
+},"Flourish":{
+"name":"Flourish",
+"damage":3,
+"damageType":"PIERCING",
+"special":0,
+"type":"Sword",
+"range":80,
+"description":"A stylish saber well-appointed to foiling your enemies."   
+},"Swift Flourish":{
+"name":"Swift Flourish",
+"damage":7,
+"damageType":"PIERCING",
+"special":0,
+"type":"Sword",
+"range":80,
+"description":"An upgraded Flourish for knights who make a point of dispatching opponents with a bit of flair."   
+},"Alchemer":{
+"name":"Alchemer",
+"damage":3,
+"damageType":"ELEMENTAL",
+"special":0,
+"type":"Gun",
+"range":70,
+"description":"An alchemical handgun that fires bullets of photon-charged liquid that split on impact." 
+},"Nightblade":{
+"name":"Nightblade",
+"damage":9,
+"damageType":"SHADOW",
+"special":0,
+"type":"Sword",
+"range":70,
+"description":"A short slicer infused with the essence of the Underworld." 
+},"Fireburst Brandish":{
+"name":"Fireburst Brandish",
+"damage":7,
+"damageType":"ELEMENTAL",
+"status":"FIRE",
+"special":0,
+"type":"Sword",
+"range":70,
+"description":"An upgraded Brandish infused with the elemental essence of fire." 
+},"Iceburst Brandish":{
+"name":"Iceburst Brandish",
+"damage":7,
+"damageType":"ELEMENTAL",
+"status":"FREEZE",
+"special":0,
+"type":"Sword",
+"range":70,
+"description":"An upgraded Brandish infused with the elemental essence of ice." 
+},"Shockburst Brandish":{
+"name":"Shockburst Brandish",
+"damage":7,
+"damageType":"ELEMENTAL",
+"status":"SHOCK",
+"special":0,
+"type":"Sword",
+"range":70,
+"description":"An upgraded Brandish infused with the elemental essence of lightning." 
+},"Magnus":{
+"name":"Magnus",
+"damage":7,
+"damageType":"PIERCING",
+"special":0,
+"type":"Gun",
+"range":60,
+"description":"A large handgun with hard hitting rounds that can leave even the strongest of monsters dazed. A charged shot can even pierce through multiple enemies." 
+},"God":{
+"name":"God",
+"damage":9999999999,
+"damageType":"God",
+"special":0,
+"type":"Sword",
+"range":100,
+"description":"I. AM. GOD."
+},"Brandish Recipe":{
+"name":"Brandish Recipe",
+"type":"Recipe",
+"description":"Blueprints for Brandish. It requires: 5 Dark Shards, 2 Beast Scales, and 2 Monster Bones",
+"needed":["Dark Shard", "Beast Scale", "Monster Bone"],
+"amounts":[5,2,2],
+"crowns":1000
+},"Fireburst Brandish Recipe":{
+"name":"Brandish Recipe",
+"type":"Recipe",
+"description":"Blueprints for Fireburst Brandish. It requires: 10 Red Shards, 3 Beast Scales, 1 Monster Bone, 1 Blast Powder, 1 Torchstone, 1 Brandish.",
+"needed":["Red Shard", "Beast Scale", "Monster Bone","Blast Powder","Torchstone","Brandish"],
+"amounts":[10,3,1,1,1,1],
+"crowns":1000
+},"Iceburst Brandish Recipe":{
+"name":"Brandish Recipe",
+"type":"Recipe",
+"description":"Blueprints for Iceburst Brandish. It requires: 10 Green Shards, 3 Beast Scales, 1 Monster Bone, 1 Frost Gel, 1 Hailstone, 1 Brandish.",
+"needed":["Red Shard", "Beast Scale", "Monster Bone","Frost Gel","Hailstone","Brandish"],
+"amounts":[5,3,1,1,1,1],
+"crowns":1000
+},"Shockburst Brandish Recipe":{
+"name":"Brandish Recipe",
+"type":"Recipe",
+"description":"Blueprints for Shockburst Brandish. It requires: 10 Green Shards, 3 Beast Scales, 1 Monster Bone, 1 Volt Oil, 1 Static Clinger, 1 Brandish.",
+"needed":["Blue Shard", "Beast Scale", "Monster Bone","Volt Oil","Static Clinger","Brandish"],
+"amounts":[10,3,1,1,1,1],
+"crowns":1000
+},"Flourish Recipe":{
+"name":"Flourish Recipe",
+"type":"Recipe",
+"description":"Blueprints for Flourish. It requires: 5 Blue Shards, 2 Sharp Fangs, 2 Swordstones.",
+"needed":["Blue Shard", "Sharp Fang", "Swordstone"],
+"amounts":[5,2,2],
+"crowns":1000
+},"Calibur Recipe":{
+"name":"Brandish Recipe",
+"type":"Recipe",
+"description":"Blueprints for Brandish.  It requires: 5 Dark Shard, 2 Beast Scales, 2 Monster Bones",
+"needed":["Dark Shard", "Beast Scale", "Monster Bone"],
+"amounts":[5,2,2],
+"crowns":1000
+},"Alchemer Recipe":{
+"name":"Alchemer Recipe",
+"type":"Recipe",
+"description":"Blueprints for Alchemer.  It requires: 5 Light Shard, 2 Gel Drops, 1 Gel Core, 1 Owlite Feather",
+"needed":["Light Shard", "Gel Drop", "Gel Core","Owlite Feather"],
+"amounts":[5,2,1,1],
+"crowns":1000
+},"Blaster Recipe":{
+"name":"Blaster Recipe",
+"type":"Recipe",
+"description":"Blueprints for Blaster. It requires: 5 Blue Shards, 2 Bronze Bolts, 2 Gremlin Gizmos",
+"needed":["Blue Shard", "Bronze Bolt", "Gremlin Gizmo"],
+"amounts":[5,2,2],
+"crowns":1000
+},"Autogun Recipe":{
+"name":"Autogun Recipe",
+"type":"Recipe",
+"description":"Blueprints for Autogun.  It requires: 5 Blue Shards, 2 Scrap Metals, 2 Iron Gears.",
+"needed":["Blue Shard", "Scrap Metal", "Iron Gear"],
+"amounts":[5,2,2],
+"crowns":1000
+},"Needleshot Recipe":{
+"name":"Needleshot Recipe",
+"type":"Recipe",
+"description":"Blueprints for Needleshot.  It requires: 10 Light Shards, 3 Sharp Fangs, 2 Iron Gears, 1 Phial of Phear, 1 Autogun.",
+"needed":["Light Shard", "Sharp Fang", "Iron Gear","Phial of Phear","Autogun"],
+"amounts":[10,3,2,1,1],
+"crowns":4000
+},"Nightblade Recipe":{
+"name":"Nightblade Recipe",
+"type":"Recipe",
+"description":"Blueprints for Nightblade.  It requires: 10 Dark Shards, 3 Brimstone, 2 Forbidden Fruits, 1 Phial of Phear, 1 Brandish",
+"needed":["Dark Shard", "Brimstone", "Forbidden Fruit","Phial of Phear","Brandish"],
+"amounts":[10,3,2,1,1],
+"crowns":4000
+},"Swift Flourish Recipe":{
+"name":"Swift Flourish Recipe",
+"type":"Recipe",
+"description":"Blueprints for Swift Flourish.  It requires: 10 Blue Shards, 3 Sharp Fangs, 2 Swordstone, 1 Force Dynamo, 1 Flourish.",
+"needed":["Blue Shard", "Sharp Fang", "Swordstone","Force Dynamo","Flourish"],
+"amounts":[10,3,2,1,1],
+"crowns":4000
+},"Magnus Recipe":{
+"name":"Magnus Recipe",
+"type":"Recipe",
+"description":"Blueprints for Magnus.  It requires: 10 Red Shard, 3 Bronze Bolts, 2 Gremlin Gizmos, 1 Force Dynamo.",
+"needed":["Red Shard", "Bronze Bolt", "Gremlin Gizmo","Force Dynamo"],
+"amounts":[10,3,2,1],
+"crowns":4000
+},"Crimsonite":{
+"name":"Crimsonite",
+"type":"Mineral",
+"description":"A fabled mineral of a fiery, red color said to contain the passion, anger and strength of the life surrounding it."
+},"Dark Matter":{
+"name":"Dark Matter",
+"type":"Mineral",
+"description":"A fabled mineral dark and ominous in color said to contain the essences of both chaos and nothingness."
+},"Luminite":{
+"name":"Luminite",
+"type":"Mineral",
+"description":"A fabled mineral of a radiant, golden color said to contain the faith, wisdom, and zeal of the life surrounding it."
+},"Valestone":{
+"name":"Valestone",
+"type":"Mineral",
+"description":"A fabled mineral of a vibrant green color said to contain the essence of all natural life."
+},"Moonstone":{
+"name":"Moonstone",
+"type":"Mineral",
+"description":"A fabled mineral of a brilliant, blue color said to contain the knowledge and origins of all worlds."
+},"Blue Shard":{
+"name":"Blue Shard",
+"type":"Material",
+"description":"A shard of Moonstone that is too small to be used in powering gates but highly useful in alchemy."
+},"Light Shard":{
+"name":"Light Shard",
+"type":"Material",
+"description":"A shard of Luminite that is too small to be used in powering gates but highly useful in alchemy."
+},"Green Shard":{
+"name":"Green Shard",
+"type":"Material",
+"description":"A shard of Valestone that is too small to be used in powering gates, but highly useful in alchemy."
+},"Dark Shard":{
+"name":"Dark Shard",
+"type":"Material",
+"description":"A shard of Dark Matter that is too small to be used in powering gates but highly useful in alchemy."
+},"Red Shard":{
+"name":"Red Shard",
+"type":"Material",
+"description":"A shard of Crimsonite that is too small to be used in powering gates but highly useful in alchemy."
+},"Brimstone":{
+"name":"Brimstone",
+"type":"Material",
+"description":"A smelly, stygian, sulfuric shard commonly found in the Underworld."
+},"Ecto Drop":{
+"name":"Ecto Drop",
+"type":"Material",
+"description":"A bit of ectoplasm meticulously collected from an unwilling undead volunteer. It's an unpleasant shade of green."
+},"Grave Soil":{
+"name":"Grave Soil",
+"type":"Material",
+"description":"Dreadful dirt dredged from a creepy crypt. It is always a little cold to the touch."
+},"Vile Seal":{
+"name":"Vile Seal",
+"type":"Material",
+"description":"A small scrap of ancient parchment imbued with dark magicks. It is believed that they grant power to those with evil souls."
+},"Scrap Metal":{
+"name":"Scrap Metal",
+"type":"Material",
+"description":"A discarded piece of metal that could be easily repurposed."
+},"Spark Plug":{
+"name":"Spark Plug",
+"type":"Material",
+"description":"A small, mechanical component that really gets a construct's motor running."
+},"Gel Core":{
+"name":"Gel Core",
+"type":"Material",
+"description":"A fist-sized, gelatinous lump collected from a jelly."
+},"Gel Drop":{
+"name":"Gel Drop",
+"type":"Material",
+"description":"A drop of goo collected from a jelly. It's still quivering." 
+},"Driftwood":{
+"name":"Driftwood",
+"type":"Material",
+"description":"A peculiar piece of wood that just won't stay put."
+},"Beast Scale":{
+"name":"Beast Scale",
+"type":"Material",
+"description":"A relatively intact scale recovered from a Clockworks creature."
+},"Sharp Fang":{
+"name":"Sharp Fang",
+"type":"Material",
+"description":"A particularly pointy premolar. Or maybe it's a canine?"
+},"Monster Bone":{
+"name":"Monster Bone",
+"type":"Material",
+"description":"An intact bone from a now-deceased beast."
+},"Swordstone":{
+"name":"Swordstone",
+"type":"Material",
+"description":"A fine chunk of natural rock perfect for honing the edge of a deadly blade."
+},"Iron Gear":{
+"name":"Iron Gear",
+"type":"Material",
+"description":"A metal gear that was once a component of a complicated contraption."
+},"Bronze Bolt":{
+"name":"Bronze Bolt",
+"type":"Material",
+"description":"A simple bronze bolt found everywhere throughout the Clockworks."
+},"Gremlin Gizmo":{
+"name":"Gremlin Gizmo",
+"type":"Material",
+"description":"A strange device used in gremlin machinery. It is inscribed with a warning against exposing it to direct sunlight or submerging it in water."
+},"Owlite Feather":{
+"name":"Owlite Feather",
+"type":"Material",
+"description":"A small feather plucked from an Owlite, said to be a mythical race of great magician birds."
+},"Frayed Fabric":{
+"name":"Frayed Fabric",
+"type":"Material",
+"description":"The worn remains of a Clockworks denizen's duds. It could probably be recycled."
+},"Forbidden Fruit":{
+"name":"Forbidden Fruit",
+"type":"Material",
+"description":"A sinful snack favored by famished fiends."
+},"Force Dynamo":{
+"name":"Force Dynamo",
+"type":"Material",
+"description":"A beguiling gadget that can seemingly generate energy from nowhere."
+},"Phial of Phear":{
+"name":"Phial of Phear",
+"type":"Material",
+"description":"A glass tube containing a small dose of phearium, a strange chemical said to induce panic into anyone who even gets so much as a whiff of the stuff."
+},"Volt Oil":{
+"name":"Volt Oil",
+"type":"Material",
+"description":"A slippery substance that always holds a slight electrical charge."
+},"Static Clinger":{
+"name":"Static Clinger",
+"type":"Material",
+"description":"A latent strand of energy that floats throughout the Clockworks, frequently catching onto hair and clothing. It's too large to properly distill into Energy, but it's very useful in alchemy."
+},"Torchstone":{
+"name":"Torchstone",
+"type":"Material",
+"description":"A small rock that smolders constantly. Gremlins patrolling the Cooling Chambers occasionally use them as a hand warmer."
+},"Blast Powder":{
+"name":"Blast Powder",
+"type":"Material",
+"description":"A dangerous by-product produced by fire-based organic creatures. Gremlins like to use it to blow stuff up."
+},"Hailstone":{
+"name":"Hailstone",
+"type":"Material",
+"description":"A small rock that's always a little cold to the touch. It's great for chilling beverages without diluting their flavor."
+},"Frost Gel":{
+"name":"Frost Gel",
+"type":"Material",
+"description":"A drop of chilly gunk collected from a cool Clockworks customer."
+},"Heart":{
+"name":"Heart",
+"type":"Usable",
+"usage":" has restored 5 health!",
+"heal":5
+},"Spark of Life":{
+"name":"Spark of Life",
+"type":"Usable",
+"usage":" has restored to full health!",
+"description":"A powerful charge of pure energy that instantly revives you or a fellow party member."
+},"Health Capsule":{
+"name":"Health Capsule",
+"type":"Usable",
+"usage":" has restored 10 health!",
+"description":"A pill taken to restore vitality."
+},"Recruit Badge":{
+"name":"Recruit Badge",
+"type":"Material",
+"description":"A badge showing you are able to fight monsters."
+}
+}
