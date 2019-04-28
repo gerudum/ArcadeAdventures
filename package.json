@@ -2,7 +2,7 @@
   "name": "thearcade",
   "version": "1.0.0",
   "description": "The Arcade of the Guild: Arcade Incorporated!",
-  "main":"index.js",
+  "start":"index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
