@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const bot = new Discord.Client();
 require('http').createServer().listen(3000)
 
+
 var
   CircularJSON = require('circular-json'),
   obj = { foo: 'bar' },
