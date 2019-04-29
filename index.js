@@ -21,17 +21,17 @@ var
 
 const fs = require('fs');
 
-let userData = JSON.parse(fs.readFileSync('Storage/userData.json','utf8')); // Player Stats
-let monsters = JSON.parse(fs.readFileSync('Storage/monsters.json','utf8')); //Read Only
-let enemies = JSON.parse(fs.readFileSync('Storage/enemyInstance.json','utf8')); //Active Enemies
-let dungeons = JSON.parse(fs.readFileSync('Storage/dungeons.json',"utf8")); //Read Only
-let dungeon = JSON.parse(fs.readFileSync('Storage/dungeonInstance.json',"utf8")); //Active Dungeon
-let scenarios = JSON.parse(fs.readFileSync('Storage/scenarios.json',"utf8")); //Read Only
-let items = JSON.parse(fs.readFileSync('Storage/items.json',"utf8")); //Read Only
-let rooms = JSON.parse(fs.readFileSync('Storage/rooms.json',"utf8")); //Read Only
-let gate = JSON.parse(fs.readFileSync('Storage/gate.json',"utf8")); //Checking if it's time for a new gate.
-let status = JSON.parse(fs.readFileSync('Storage/status.json',"utf8")); //Statuses!
-let auctions = JSON.parse(fs.readFileSync('Storage/auctions.json',"utf8")); //Checking if it's time for a new gate.
+let userData = JSON.parse(fs.readFileSync('.data/userData.json','utf8')); // Player Stats
+let monsters = JSON.parse(fs.readFileSync('.data/monsters.json','utf8')); //Read Only
+let enemies = JSON.parse(fs.readFileSync('.data/enemyInstance.json','utf8')); //Active Enemies
+let dungeons = JSON.parse(fs.readFileSync('.data/dungeons.json',"utf8")); //Read Only
+let dungeon = JSON.parse(fs.readFileSync('.data/dungeonInstance.json',"utf8")); //Active Dungeon
+let scenarios = JSON.parse(fs.readFileSync('.data/scenarios.json',"utf8")); //Read Only
+let items = JSON.parse(fs.readFileSync('.data/items.json',"utf8")); //Read Only
+let rooms = JSON.parse(fs.readFileSync('.data/rooms.json',"utf8")); //Read Only
+let gate = JSON.parse(fs.readFileSync('.data/gate.json',"utf8")); //Checking if it's time for a new gate.
+let status = JSON.parse(fs.readFileSync('.data/status.json',"utf8")); //Statuses!
+let auctions = JSON.parse(fs.readFileSync('.data/auctions.json',"utf8")); //Checking if it's time for a new gate.
 
 const prefix = "!";
 var commands = ["PREFIX = !", "info version", "fight {enemyname}", "forward","check {object}","inventory", "inventory stats", ];
@@ -48,6 +48,7 @@ var forwardEmoji = "567468996014899240";
 var descendEmoji = "567866647369613341";
 var inventoryEmoji = "567866805763440640";
 var gateEmoji = "567867432300183562";
+var specialEmoji = "572159195932262450";
 var bidEmoji = "569973521124425758";
 var buyEmoji = "569973669376426000";
 
@@ -71,7 +72,7 @@ function Update(){
             if(auctions[key].time <= 0){
                 UpdateAuction(key,auctions[key].time,auctions[key].bid);
             }
-            fs.writeFile('Storage/auctions.json', JSON.stringify(auctions), (err) =>{
+            fs.writeFile('.data/auctions.json', JSON.stringify(auctions), (err) =>{
                 if (err) console.error(err);
             })   
         }      
@@ -81,8 +82,8 @@ function Interact(room,player){
     const interaction = new Discord.RichEmbed();
     interaction.setTitle(userData[player].name + "'s Interaction")
     interaction.addField(room.interaction,"Interesting.")
-    interaction.addField(room.spawn + " has appeared!", "Oh no!")
     if(room.spawn != null){
+        interaction.addField(room.spawn + " has appeared!", "Oh no!")
         enemies.depth[userData[player].depth].location[userData[player].location].enemy = {};
         enemies.depth[userData[player].depth].location[userData[player].location].enemy = monsters[room.spawn];
         SaveData();
@@ -591,10 +592,17 @@ function Forward(player){
     if(myEnemy.health <= 0 && rooms[dungeon.depth[userData[player].depth].currentrooms[userData[player].location]].type === "battle"){
         //console.log("New Monster " + monsters[newMob].name);
         myEnemy = monsters[newMob];
-        myEnemy.health = Math.floor(monsters[newMob].max * userData[player].depth/9);
-        if(myEnemy.health <= 0){
-            myEnemy.health = 1;
-        }
+        if(userData[player].depth < 18){
+            myEnemy.health = Math.floor(monsters[newMob].max * userData[player].depth/4);
+            if(myEnemy.health <= 0){
+                myEnemy.health = 1;
+            }
+        } else {
+            myEnemy.health = Math.floor((monsters[newMob].max * userData[player].depth/4) * 2);
+            if(myEnemy.health <= 0){
+                myEnemy.health = 1;
+            }
+        }  
         myEnemy.turn = monsters[newMob].attackSpeed;
         myEnemy.attackSpeed = monsters[newMob].attackSpeed;
         for(var key in status){
@@ -681,7 +689,7 @@ function Fight(target, player,defend){
         PartyAction(embed,player);
         return;
     }
-    
+    userData[player].cooldown -= 1;
     var myName = userData[player].name;
     var defense = 0;
     var myEnemy = enemies.depth[userData[player].depth].location[userData[player].location].enemy;
@@ -699,8 +707,6 @@ function Fight(target, player,defend){
     const embed = new Discord.RichEmbed()
     if(userData[player].status != null){
         userData[player].status.duration -= 1;
-        
-        
         switch(userData[player].status.name){
             //Damage over time
             case 'fire':
@@ -762,7 +768,11 @@ function Fight(target, player,defend){
                 for(var i = 0; i < weapon.multihit; i++){
                     if(AttackChance(weapon.chance)){
                         embed.addField("You hit again!","Bam!")
-                        damage += weapon.damage;
+                        if(myEnemy.weakness === items[userData[player].equipped].damageType){
+                            damage += Math.floor(weapon.damage * 1.5);
+                        } else if (myEnemy.resistance === items[userData[player].equipped].damageType){
+                            damage += Math.floor(weapon.damage * 0.5);
+                        } 
                     }         
                 }
             }
@@ -867,13 +877,71 @@ function Fight(target, player,defend){
             }
         
 }
+function Special(player){
+    const special = new Discord.RichEmbed()
+    special.setTitle(userData[player].name + 's Special')
+    var mySpecial = items[userData[player].equipped].special;
+    if(userData[player].cooldown <= 0){
+        if(mySpecial === "heal"){
+            userData[player].cooldown = 6;
+            userData[player].health += items[userData[player].equipped].damage;
+            special.addField(userData[player].name + " used their special move and healed for " + items[userData[player].equipped].damage + " points!","Whoa!")
+        } else if (mySpecial === "damage"){
+            userData[player].cooldown = 6;
+            if(enemies.depth[userData[player].depth].location[userData[player].location].enemy != null && userData[player].location > 0){  
+                if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.health > 0){
+                    var myEnemy = enemies.depth[userData[player].depth].location[userData[player].location].enemy;
+                    myEnemy.health -= (items[userData[player].equipped].damage * 2);
+                    special.addField(userData[player].name + " used their special move and dealt " + items[userData[player].equipped].damage * 2 + " points of damage!","Whoa!")
+                    if(myEnemy.health <= 0){
+                        var people = [];
+                        special.addField(myEnemy.name + " fainted ", "...")
+                        for(var key in userData){
+                            if(userData[key].location === userData[player].location && userData[key].depth === userData[player].depth){
+                                var rewards = CreateLoot(myEnemy.lootTable, myEnemy.lootWeights);
+                                var crownRewards  = CreateLoot(crowns,crownWeights);
+                                crownRewards = Math.floor(crownRewards * gate.depthscale[userData[player].depth]);
+                                people.push(userData[key].name);
+                                AddItem(rewards,player);
+        
+                                userData[key].experience += Math.floor(myEnemy.exp * gate.depthscale[userData[player].depth]);
+                                userData[key].crowns += crownRewards          
+                                
+                                special.addField(userData[key].name + "'s Loot", crownRewards + " crowns, and " + rewards)
+                            }
+                        }
+                        special.addField(people + " have gained " + myEnemy.exp + " experience points ", "Congrats")
+                        myEnemy = null;
+                        myEnemy = {};
+                        myEnemy.health = 0;
+                        enemies.depth[userData[player].depth].location[userData[player].location].enemy = myEnemy;
+                    }
+                    for(var key in userData){
+                        if(userData[key].location === userData[player].location && userData[key].depth === userData[player].depth){
+                            PartyAction(embed,key);
+                        }
+                    }
+                } else {
+                    special.addField("No enemy here to attack", "Sad.")
+                }
+            } else {
+                special.addField("No enemy here to attack", "Sad.")
+            }
+        } else {
+            special.addField(userData[player].name + " you don't have a special move.", "Sad.")
+        }
+    } else {
+        special.addField(userData[player].name + "'s special move isn't ready yet, you need " + userData[player].cooldown + " more battle commands.","Fight, fight, fight!")
+    }
+    
+    PartyAction(special,player);
+}
 function Inventory(player){
     Log(userData[player].name + " is checking their inventory.");
     if(userData[player].partyInstance === 0){
         return;
     }  
-    
-    
+
     const inv = new Discord.RichEmbed() 
     
         var materials = [];
@@ -931,24 +999,24 @@ function Inventory(player){
     PartyAction(inv,player); 
 }
 function SaveData(){
-    fs.writeFile('Storage/userData.json', CircularJSON.stringify(userData), (err) =>{
+    fs.writeFile('.data/userData.json', CircularJSON.stringify(userData), (err) =>{
         if (err) console.error(err);
     })
-    fs.writeFile('Storage/enemyInstance.json', JSON.stringify(enemies), (err) =>{
+    fs.writeFile('.data/enemyInstance.json', JSON.stringify(enemies), (err) =>{
         if (err) console.error(err);
     }) 
-    fs.writeFile('Storage/dungeonInstance.json', JSON.stringify(dungeon), (err) =>{
+    fs.writeFile('.data/dungeonInstance.json', JSON.stringify(dungeon), (err) =>{
         if (err) console.error(err);
     })
-    fs.writeFile('Storage/gate.json', JSON.stringify(gate), (err) =>{
+    fs.writeFile('.data/gate.json', JSON.stringify(gate), (err) =>{
         if (err) console.error(err);
     })
-    fs.writeFile('Storage/auctions.json', JSON.stringify(auctions), (err) =>{
+    fs.writeFile('.data/auctions.json', JSON.stringify(auctions), (err) =>{
         if (err) console.error(err);
     })
 }
 function PlayerCommands(instance,player){
-    var actions = [forwardEmoji,blockEmoji,fightEmoji,inventoryEmoji,gateEmoji,descendEmoji];
+    var actions = [forwardEmoji,blockEmoji,fightEmoji,inventoryEmoji,gateEmoji,descendEmoji,specialEmoji];
     const filter = (reaction, user) => actions.includes(reaction.emoji.id) && user.id === player
     const collector = instance.createReactionCollector(filter, { max: 10000000, time: 2147483647 });
                  collector.on('collect', r => {
@@ -989,6 +1057,8 @@ function PlayerCommands(instance,player){
                      } else if (r.emoji.name === 'gate'){
                         CheckGate(player);
                         
+                     } else if (r.emoji.name === 'special'){
+                        Special(player);
                      }
                     
         });
@@ -1003,7 +1073,7 @@ function PartyAction(action, player){
     channel.send("Please type in the channel that your party instance is in.");
 }}
 function Log(action){
-    var path = 'Storage/log.txt';
+    var path = '.data/log.txt';
     var currentdate = new Date(); 
     var datetime = "Time: " + currentdate.getDate() + "/"
                 + (currentdate.getMonth()+1)  + "/" 
@@ -1039,9 +1109,14 @@ bot.on('message', message=> {
         userData[player].location = 0;
         userData[player].depth = 0;
         userData[player].partyInstance = 0;
-        userData[player].partyChannel = null;     
+        userData[player].partyChannel = null;  
+        userData[player].trinket = {};
+        userData[player].cooldown = 0;   
     } 
-
+    if(!userData[player].trinket){
+        userData[player].trinket = {};
+        userData[player].cooldown = 0;  
+    }
     userData[player].myChannel = message.channel.id;
     if(message.author.username != userData[player].name){
         userData[player].name  = message.author.username;
@@ -1546,13 +1621,14 @@ bot.on('message', message=> {
                     newRole.setName(name, "text");
                     message.member.addRole(newRole);
                     embed.setTitle(userData[player].name + "'s instance")
-                        myServer.send(embed).then  (sentEmbed =>{
-                            sentEmbed.react(fightEmoji);
-                            sentEmbed.react(blockEmoji);
-                            sentEmbed.react(forwardEmoji);
-                            sentEmbed.react(inventoryEmoji);
-                            sentEmbed.react(gateEmoji);
-                            sentEmbed.react(descendEmoji);
+                        myServer.send(embed).then  (async function (sentEmbed) {
+                            await sentEmbed.react(fightEmoji);
+                            await sentEmbed.react(specialEmoji);
+                            await sentEmbed.react(blockEmoji);
+                            await sentEmbed.react(forwardEmoji);
+                            await sentEmbed.react(inventoryEmoji);
+                            await sentEmbed.react(gateEmoji);
+                            await sentEmbed.react(descendEmoji);
                             CreateParty(sentEmbed);
                             PlayerCommands(sentEmbed,player);
                             
