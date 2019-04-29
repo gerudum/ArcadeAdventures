@@ -1,0 +1,256 @@
+{"ClockworkTunnels":{
+"name":"Clockwork Tunnels",
+"art":"https://i.imgur.com/D793gsY.png",
+"weight":5,
+"rooms":["tunnel1","tunnel3","tunnel4","tunnel1","tunnel3","tunnel4","tunnel1","tunnel3","tunnel4","treasure","crimsonite","luminite","darkmatter","moonstone","valestone","basil","danger1"],
+"currentrooms": [],
+"theme":["construct","random"]
+},"LichenousLair":{
+"name":"Lichenous Lair",
+"art":"https://i.imgur.com/y5Ovb5O.png",
+"weight":5,
+"rooms":["lich1","lich2","lich3","lich1","lich2","lich3","lich1","lich2","lich3","treasure","crimsonite","luminite","darkmatter","moonstone","valestone","basil","giant"],
+"currentrooms": [],
+"theme":["slime","random"]
+},"BattleArena":{
+"name":"Battle Arena",
+"art":"https://i.imgur.com/Yz4l6kG.png",
+"weight":5,
+"rooms":[],
+"currentrooms": ["tunnel1","tunnel3","tunnel4","treasure","treasure","tunnel1","tunnel3","tunnel2","treasure","treasure","treasure","lich1","lich3","lich3","lich4","treasure","treasure","treasure","treasure","treasure","treasure"],
+"theme":["any","random"]
+},"Drudgery":{
+"name":"Devilish Drudgery",
+"art":"https://i.imgur.com/SE4P2w6.png",
+"rooms":["fiend1","fiend2","fiend1","fiend2","fiend1","fiend2","crimsonite","luminite","darkmatter","moonstone","valestone","basil"],
+"currentrooms": [],
+"theme":["fiend","random"]
+},"SinfulSteps":{
+"name":"Dark City: Sinful Steps",
+"art":"https://i.imgur.com/z7UfYzq.png",
+"rooms":[],
+"currentrooms": ["fiend1","fiend1","fiend2","undead2","treasure","treasure","fiend1","fiend2","undead2","treasure","darkmatter","crimsonite"],
+"theme":["fiend","random"]
+},"SinfulSteps2":{
+"name":"Dark City: Sinful Steps 2",
+"art":"https://i.imgur.com/z7UfYzq.png",
+"rooms":[],
+"currentrooms": ["fiend1","fiend2","undead2","fiend1","treasure","treasure","fiend1","undead2","luminite","valestone"],
+"theme":["fiend","random"]
+},"RitualRoad":{
+"name":"Dark City: Ritual Road",
+"art":"https://i.imgur.com/z7UfYzq.png",
+"rooms":[],
+"currentrooms": ["fiend1","undead2","undead2","fiend1","treasure","fiend1","undead2","moonstone","crimsonite","undead2","fiend1","treasure","treasure"],
+"theme":["fiend","random"]
+},"RitualRoad2":{
+"name":"Dark City: Ritual Road 2",
+"art":"https://i.imgur.com/z7UfYzq.png",
+"rooms":[],
+"currentrooms": ["fiend1","fiend2","fiend2","treasure","fiend2","undead2","undead2","treasure","treasure"],
+"theme":["fiend","random"]
+},"RitualRoad3":{
+"name":"Dark City: Ritual Road 3",
+"art":"https://i.imgur.com/z7UfYzq.png",
+"rooms":[],
+"currentrooms": ["undead2","undead2","fiend2","fiend1","treasure","treasure","undead2","fiend2","treasure"],
+"theme":["fiend","random"]
+},"Plazamonium":{
+"name":"Dark City: Plazamonium",
+"art":"https://i.imgur.com/z7UfYzq.png",
+"rooms":[],
+"currentrooms": ["fiend1","fiend1","undead2","fiend2","fiend1","undead2","undead2","treasure","treasure","treasure"],
+"theme":["fiend","random"]
+},"Compound":{
+"name":"Compound",
+"art":"https://i.imgur.com/t4HESgJ.png",
+"rooms":["fiend1","fiend2","tunnel1","tunnel2","tunnel3","tunnel4","beast1","beast2","beast3","basil","undead1","undead2","undead3","gremlin1","gremlin2","gremlin3","lich1","lich2","lich3","lich4","treasure","crimsonite","luminite","darkmatter","moonstone","valestone"],
+"currentrooms":[],
+"theme":["any","random"]
+},"Graveyard":{
+"name":"Graveyard",
+"art":"https://i.imgur.com/UEaGfuY.png",
+"rooms":["undead1","undead1","undead1","undead1","undead2","undead2","undead2","undead2","undead3","treasure","crimsonite","luminite","darkmatter","moonstone","valestone","basil"],
+"currentrooms":[],
+"theme":["undead","random"]
+},"DeconstructionZone":{
+"name":"Deconstruction Zone",
+"art":"https://i.imgur.com/D793gsY.png",
+"rooms":["gremlin1","gremlin1","gremlin1","gremlin2","gremlin2","gremlin2","gremlin2","gremlin3","treasure","treasure","crimsonite","luminite","darkmatter","moonstone","valestone","basil"],
+"currentrooms":[],
+"theme":["gremlin","random"]
+},"BeastDen":{
+"name":"Beast Den",
+"art":"https://i.imgur.com/OtYMeXw.png",
+"rooms":["beast1","beast1","beast1","beast1","beast1","beast1","beast2","beast2","beast2","beast2","beast3","treasure","crimsonite","luminite","darkmatter","moonstone","valestone","basil"],
+"currentrooms":[],
+"theme":["beast","random"]
+},"TheJellyFarm":{
+"name":"Aurora Isles: The Jelly Farm",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["lich1","lich1","lich1","lich1","treasure","lich1","lich1","tunnel2","treasure","treasure","giant","treasure"],
+"theme":["slime","random"]
+},"TheJellyFarm2":{
+"name":"Aurora Isles: The Jelly Farm 2",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["lich1","lich1","lich1","lich1","lich1","lich1","lich1","lich1","lich1","lich1","lich1"],
+"theme":["slime","random"]
+},"StoneGrove":{
+"name":"Aurora Isles: Stone Grove",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["lich1","lich1","beast1","beast1","beast2","lich1","tunnel2","treasure","treasure","treasure","treasure"],
+"theme":["slime","beast","random"]
+},"TheLowGardens":{
+"name":"Aurora Isles: The Low Gardens",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["beast1","beast1","beast1","tunnel4","beast3","beast3","treasure","treasure","beast1","beast3","tunnel2"],
+"theme":["beast","construct","random"]
+},"CravatHall1":{
+"name":"Scarlet Fortress: Cravat Hall",
+"art":"https://i.imgur.com/Xi47WeT.png",
+"rooms":[],
+"currentrooms":["undead2","undead2","treasure","lich1","lich1","undead2","treasure"],
+"theme":["undead","slime","random"]
+},"CravatHall2":{
+"name":"Scarlet Fortress: Cravat Hall 2",
+"art":"https://i.imgur.com/Xi47WeT.png",
+"rooms":[],
+"currentrooms":["undead2","lich1","undead2","lich1","treasure","treasure","undead2","lich1"],
+"theme":["undead","slime","random"]
+},"CravatHall3":{
+"name":"Scarlet Fortress: Cravat Hall 3",
+"art":"https://i.imgur.com/Xi47WeT.png",
+"rooms":[],
+"currentrooms":["undead2","undead2","undead2","lich1","treasure","treasure","treasure","treasure"],
+"theme":["undead","slime","random"]
+},"SpiralCourt1":{
+"name":"Scarlet Fortress: Spiral Court",
+"art":"https://i.imgur.com/Xi47WeT.png",
+"rooms":[],
+"currentrooms":["undead2","undead2","lich1","treasure"],
+"theme":["undead","slime","random"]
+},"SpiralCourt2":{
+"name":"Scarlet Fortress: Spiral Court 2",
+"art":"https://i.imgur.com/Xi47WeT.png",
+"rooms":[],
+"currentrooms":["lich1","undead2","undead2","lich1","lich1","treasure","treasure","lich1"],
+"theme":["undead","slime","random"]
+},"GrimGallery":{
+"name":"Scarlet Fortress: Grim Gallery",
+"art":"https://i.imgur.com/Xi47WeT.png",
+"rooms":[],
+"currentrooms":["undead2","undead2","undead2","lich1","undead2","treasure","treasure","tunnel4","undead2","lich1","tunnel4","tunnel4","treasure","treasure","lich4"],
+"theme":["undead","slime","random"]
+},"EmeraldAxis":{
+"name":"Jigsaw Valley: Emerald Axis",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel1","tunnel1","tunnel1","tunnel2","treasure","treasure","tunnel3","tunnel4","gremlin1","gremlin1","tunnel1","treasure","treasure"],
+"theme":["construct","gremlin","random"]
+},"EmeraldAxis2":{
+"name":"Jigsaw Valley: Emerald Axis 2",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel1","tunnel3","tunnel3","tunnel2","treasure","treasure","gremlin1","gremlin2","gremlin1","tunnel3","treasure","treasure","treasure"],
+"theme":["construct","gremlin","random"]
+},"JadeTangle":{
+"name":"Jigsaw Valley: Jade Tangle",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel4","tunnel4","tunnel4","tunnel2","treasure","treasure","gremlin2","gremlin3","gremlin1","treasure","tunnel1","treasure"],
+"theme":["construct","gremlin","random"]
+},"JadeTangle2":{
+"name":"Jigsaw Valley: Jade Tangle 2",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["gremlin2","gremlin1","gremlin2","treasure","treasure","tunnel2","tunnel3","tunnel4","gremlin1","treasure","treasure"],
+"theme":["construct","gremlin","random"]
+},"PerimeterPromenade":{
+"name":"Jigsaw Valley: Perimeter Promenade",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel4","tunnel1","tunnel4","treasure","treasure","treasure","gremlin1","gremlin1","treasure","treasure"],
+"theme":["construct","gremlin","random"]
+},"PerimeterPromenade2":{
+"name":"Jigsaw Valley: Perimeter Promenade 2",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel1","tunnel1","tunnel1","tunnel1","treasure","treasure","treasure"],
+"theme":["construct","gremlin","random"]
+},"TreasureVault":{
+"name":"Treasure Vault",
+"art":"https://i.imgur.com/CxFNuYy.png",
+"rooms":[],
+"currentrooms":["crimsonite","darkmatter","luminite","moonstone","valestone","treasure","treasure","treasure","treasure","treasure"],
+"theme":["any","random"]   
+},"ClockworksTerminal":{
+"name":"Clockworks Terminal",
+"art":"https://i.imgur.com/CxFNuYy.png",
+"rooms":[],
+"currentrooms":["basil","basil"]  ,
+"theme":["any","random"]    
+},"GardenofGoo":{
+"name":"Garden of Goo",
+"art":"https://i.imgur.com/uf7sMe9.png",
+"rooms":[],
+"currentrooms":["basil","lich1"],
+"theme":["slime","random"]     
+},"RedCarpetRunaround":{
+"name":"Red Carpet Runaround",
+"art":"https://i.imgur.com/uf7sMe9.png",
+"rooms":[],
+"currentrooms":["basil","lich1"],
+"theme":["slime","random"]   
+},"DangerRoom":{
+"name":"Danger Room",
+"art":"https://i.imgur.com/uf7sMe9.png",
+"rooms":[],
+"currentrooms":["danger1","danger1"],
+"theme":["any","random"]    
+},"BattleRoyale":{
+"name":"Battle Royale",
+"art":"https://i.imgur.com/uf7sMe9.png",
+"rooms":[],
+"currentrooms":["basil","lich1"],
+"theme":["slime","random"]      
+},"Config":{
+"names":
+["ClockworkTunnels",
+"LichenousLair",
+"BattleArena",
+"Drudgery",
+"BeastDen",
+"TreasureVault",
+"ClockworksTerminal",
+"DeconstructionZone",
+"Graveyard",
+"Compound",
+"TheJellyFarm",
+"TheJellyFarm2",
+"StoneGrove",
+"TheLowGardens",
+"CravatHall1",
+"CravatHall2",
+"CravatHall3",
+"SpiralCourt1",
+"SpiralCourt2",
+"GrimGallery",
+"SinfulSteps",
+"SinfulSteps2",
+"RitualRoad",
+"RitualRoad2",
+"RitualRoad3",
+"Plazamonium",
+"EmeraldAxis",
+"EmeraldAxis2",
+"JadeTangle",
+"JadeTangl2",
+"PerimeterPromenade",
+"PerimeterPromenade2"],
+"weights":[20,6,2,5,5,2,6,5,5,6,4,4,4,4,3,3,3,3,3,3,4,4,4,4,4,2,3,3,3,3,3,3]
+}
+}
