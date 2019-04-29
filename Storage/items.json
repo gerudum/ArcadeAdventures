@@ -156,21 +156,21 @@
 "amounts":[5,2,2],
 "crowns":1000
 },"Fireburst Brandish Recipe":{
-"name":"Brandish Recipe",
+"name":"Fireburst Brandish Recipe",
 "type":"Recipe",
 "description":"Blueprints for Fireburst Brandish. It requires: 10 Red Shards, 3 Beast Scales, 1 Monster Bone, 1 Blast Powder, 1 Torchstone, 1 Brandish.",
 "needed":["Red Shard", "Beast Scale", "Monster Bone","Blast Powder","Torchstone","Brandish"],
 "amounts":[10,3,1,1,1,1],
 "crowns":4000
 },"Iceburst Brandish Recipe":{
-"name":"Brandish Recipe",
+"name":"Iceburst Brandish Recipe",
 "type":"Recipe",
 "description":"Blueprints for Iceburst Brandish. It requires: 10 Green Shards, 3 Beast Scales, 1 Monster Bone, 1 Frost Gel, 1 Hailstone, 1 Brandish.",
 "needed":["Red Shard", "Beast Scale", "Monster Bone","Frost Gel","Hailstone","Brandish"],
 "amounts":[5,3,1,1,1,1],
 "crowns":4000
 },"Shockburst Brandish Recipe":{
-"name":"Brandish Recipe",
+"name":"Shockburst Brandish Recipe",
 "type":"Recipe",
 "description":"Blueprints for Shockburst Brandish. It requires: 10 Green Shards, 3 Beast Scales, 1 Monster Bone, 1 Volt Oil, 1 Static Clinger, 1 Brandish.",
 "needed":["Blue Shard", "Beast Scale", "Monster Bone","Volt Oil","Static Clinger","Brandish"],
