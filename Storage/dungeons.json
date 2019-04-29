@@ -76,7 +76,7 @@
 },"DeconstructionZone":{
 "name":"Deconstruction Zone",
 "art":"https://i.imgur.com/D793gsY.png",
-"rooms":["gremlin1","gremlin1","gremlin1","gremlin2","gremlin2","gremlin2","gremlin2","gremlin3","treasure","crimsonite","luminite","darkmatter","moonstone","valestone","basil"],
+"rooms":["gremlin1","gremlin1","gremlin1","gremlin2","gremlin2","gremlin2","gremlin2","gremlin3","treasure","treasure","crimsonite","luminite","darkmatter","moonstone","valestone","basil"],
 "currentrooms":[],
 "theme":["gremlin","random"]
 },"BeastDen":{
@@ -145,6 +145,42 @@
 "rooms":[],
 "currentrooms":["undead2","undead2","undead2","lich1","undead2","treasure","treasure","tunnel4","undead2","lich1","tunnel4","tunnel4","treasure","treasure","lich4"],
 "theme":["undead","slime","random"]
+},"EmeraldAxis":{
+"name":"Jigsaw Valley: Emerald Axis",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel1","tunnel1","tunnel1","tunnel2","treasure","treasure","tunnel3","tunnel4","gremlin1","gremlin1","tunnel1","treasure","treasure"],
+"theme":["construct","gremlin","random"]
+},"EmeraldAxis2":{
+"name":"Jigsaw Valley: Emerald Axis 2",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel1","tunnel3","tunnel3","tunnel2","treasure","treasure","gremlin1","gremlin2","gremlin1","tunnel3","treasure","treasure","treasure"],
+"theme":["construct","gremlin","random"]
+},"JadeTangle":{
+"name":"Jigsaw Valley: Jade Tangle",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel4","tunnel4","tunnel4","tunnel2","treasure","treasure","gremlin2","gremlin3","gremlin1","treasure","tunnel1","treasure"],
+"theme":["construct","gremlin","random"]
+},"JadeTangle2":{
+"name":"Jigsaw Valley: Jade Tangle 2",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["gremlin2","gremlin1","gremlin2","treasure","treasure","tunnel2","tunnel3","tunnel4","gremlin1","treasure","treasure"],
+"theme":["construct","gremlin","random"]
+},"PerimeterPromenade":{
+"name":"Jigsaw Valley: Perimeter Promenade",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel4","tunnel1","tunnel4","treasure","treasure","treasure","gremlin1","gremlin1","treasure","treasure"],
+"theme":["construct","gremlin","random"]
+},"PerimeterPromenade2":{
+"name":"Jigsaw Valley: Perimeter Promenade 2",
+"art":"https://i.imgur.com/Cn7Vdw3.png",
+"rooms":[],
+"currentrooms":["tunnel1","tunnel1","tunnel1","tunnel1","treasure","treasure","treasure"],
+"theme":["construct","gremlin","random"]
 },"TreasureVault":{
 "name":"Treasure Vault",
 "art":"https://i.imgur.com/CxFNuYy.png",
@@ -208,7 +244,13 @@
 "RitualRoad",
 "RitualRoad2",
 "RitualRoad3",
-"Plazamonium"],
-"weights":[20,6,2,5,5,2,6,5,5,6,4,4,4,4,3,3,3,3,3,3,4,4,4,4,4,2]
+"Plazamonium",
+"EmeraldAxis",
+"EmeraldAxis2",
+"JadeTangle",
+"JadeTangl2",
+"PerimeterPromenade",
+"PerimeterPromenade2"],
+"weights":[20,6,2,5,5,2,6,5,5,6,4,4,4,4,3,3,3,3,3,3,4,4,4,4,4,2,3,3,3,3,3,3]
 }
 }

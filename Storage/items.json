@@ -2,7 +2,7 @@
 "name":"Calibur",
 "damage":3,
 "damageType":"NORMAL",
-"special":5,
+"special":"damage",
 "type":"Sword",
 "range":100,
 "description":"A standard issue sword awarded to Spiral Knights who have proven themselves in the field."
@@ -10,17 +10,41 @@
 "name":"Blaster",
 "damage":2,
 "damageType":"NORMAL",
-"special":4,
+"special":"damage",
 "type":"Gun",
 "range":70,
 "description":"A versatile handgun issued to Spiral Knights who have proven themselves in the field."
+},"Elemental Blaster":{
+"name":"Elemental Blaster",
+"damage":5,
+"damageType":"ELEMENTAL",
+"special":"damage",
+"type":"Gun",
+"range":70,
+"description":"An enhanced blaster modified to fire elemental rounds."
+},"Shadow Blaster":{
+"name":"Shadow Blaster",
+"damage":5,
+"damageType":"NORMAL",
+"special":"damage",
+"type":"Gun",
+"range":70,
+"description":"An enhanced blaster modified to fire shadow rounds."
+},"Pierce Blaster":{
+"name":"Pierce Blaster",
+"damage":5,
+"damageType":"PIERCING",
+"special":"damage",
+"type":"Gun",
+"range":70,
+"description":"An enhanced blaster modified to fire piercing rounds."
 },"Autogun":{
 "name":"Autogun",
 "damage":1,
 "damageType":"NORMAL",
 "multihit":6,
 "chance":30,
-"special":4,
+"special":"damage",
 "type":"Gun",
 "range":90,
 "description":"A fully automated handgun capable of rapidly firing powerful bolts of energy."  
@@ -30,7 +54,7 @@
 "damageType":"PIERCING",
 "multihit":6,
 "chance":30,
-"special":4,
+"special":"damage",
 "type":"Gun",
 "range":90,
 "description":"An Autogun modified to fire piercing bolts at an alarming rate.."  
@@ -45,7 +69,7 @@
 "name":"Brandish",
 "damage":4,
 "damageType":"NORMAL",
-"special":0,
+"special":"damage",
 "type":"Sword",
 "range":100,
 "description":"An all-purpose bomb issued to Spiral Knights who have proven themselves in the field."
@@ -61,7 +85,7 @@
 "name":"Swift Flourish",
 "damage":7,
 "damageType":"PIERCING",
-"special":0,
+"special":"damage",
 "type":"Sword",
 "range":80,
 "description":"An upgraded Flourish for knights who make a point of dispatching opponents with a bit of flair."   
@@ -69,7 +93,7 @@
 "name":"Alchemer",
 "damage":3,
 "damageType":"ELEMENTAL",
-"special":0,
+"special":"damage",
 "type":"Gun",
 "range":70,
 "description":"An alchemical handgun that fires bullets of photon-charged liquid that split on impact." 
@@ -77,7 +101,7 @@
 "name":"Nightblade",
 "damage":9,
 "damageType":"SHADOW",
-"special":0,
+"special":"damage",
 "type":"Sword",
 "range":70,
 "description":"A short slicer infused with the essence of the Underworld." 
@@ -86,7 +110,7 @@
 "damage":7,
 "damageType":"ELEMENTAL",
 "status":"FIRE",
-"special":0,
+"special":"damage",
 "type":"Sword",
 "range":70,
 "description":"An upgraded Brandish infused with the elemental essence of fire." 
@@ -95,7 +119,7 @@
 "damage":7,
 "damageType":"ELEMENTAL",
 "status":"FREEZE",
-"special":0,
+"special":"damage",
 "type":"Sword",
 "range":70,
 "description":"An upgraded Brandish infused with the elemental essence of ice." 
@@ -104,7 +128,7 @@
 "damage":7,
 "damageType":"ELEMENTAL",
 "status":"SHOCK",
-"special":0,
+"special":"damage",
 "type":"Sword",
 "range":70,
 "description":"An upgraded Brandish infused with the elemental essence of lightning." 
@@ -112,7 +136,7 @@
 "name":"Magnus",
 "damage":7,
 "damageType":"PIERCING",
-"special":0,
+"special":"damage",
 "type":"Gun",
 "range":60,
 "description":"A large handgun with hard hitting rounds that can leave even the strongest of monsters dazed. A charged shot can even pierce through multiple enemies." 
@@ -137,21 +161,21 @@
 "description":"Blueprints for Fireburst Brandish. It requires: 10 Red Shards, 3 Beast Scales, 1 Monster Bone, 1 Blast Powder, 1 Torchstone, 1 Brandish.",
 "needed":["Red Shard", "Beast Scale", "Monster Bone","Blast Powder","Torchstone","Brandish"],
 "amounts":[10,3,1,1,1,1],
-"crowns":1000
+"crowns":4000
 },"Iceburst Brandish Recipe":{
 "name":"Brandish Recipe",
 "type":"Recipe",
 "description":"Blueprints for Iceburst Brandish. It requires: 10 Green Shards, 3 Beast Scales, 1 Monster Bone, 1 Frost Gel, 1 Hailstone, 1 Brandish.",
 "needed":["Red Shard", "Beast Scale", "Monster Bone","Frost Gel","Hailstone","Brandish"],
 "amounts":[5,3,1,1,1,1],
-"crowns":1000
+"crowns":4000
 },"Shockburst Brandish Recipe":{
 "name":"Brandish Recipe",
 "type":"Recipe",
 "description":"Blueprints for Shockburst Brandish. It requires: 10 Green Shards, 3 Beast Scales, 1 Monster Bone, 1 Volt Oil, 1 Static Clinger, 1 Brandish.",
 "needed":["Blue Shard", "Beast Scale", "Monster Bone","Volt Oil","Static Clinger","Brandish"],
 "amounts":[10,3,1,1,1,1],
-"crowns":1000
+"crowns":4000
 },"Flourish Recipe":{
 "name":"Flourish Recipe",
 "type":"Recipe",
@@ -180,6 +204,27 @@
 "needed":["Blue Shard", "Bronze Bolt", "Gremlin Gizmo"],
 "amounts":[5,2,2],
 "crowns":1000
+},"Elemental Blaster Recipe":{
+"name":"Elemental Blaster Recipe",
+"type":"Recipe",
+"description":"Blueprints for Elemental Blaster. It requires: 10 Green Shards, 3 Spark Plugs,  1 Frayed Fabric, 1 Critter Carapace, 1 Soul Dust, 1 Blaster",
+"needed":["Green Shard", "Spark Plug", "Frayed Fabric", "Critter Carapace", "Soul Dust", "Blaster"],
+"amounts":[10,3,1,1,1,1],
+"crowns":4000
+},"Shadow Blaster Recipe":{
+"name":"Shadow Blaster Recipe",
+"type":"Recipe",
+"description":"Blueprints for Shadow Blaster. It requires: 10 Dark Shards, 3 Vile Seals, 1 Sinful Brew, 1 Owlite Feather, 1 Brute Core, 1 Blaster",
+"needed":["Dark Shard", "Vile Seal", "Sinful Brew","Owlite Feather","Brute Core","Blaster"],
+"amounts":[10,3,1,1,1,1],
+"crowns":4000
+},"Pierce Blaster Recipe":{
+"name":"Pierce Blaster Recipe",
+"type":"Recipe",
+"description":"Blueprints for Pierce Blaster. It requires: 10 Light Shards, 3 Sharp Fangs, 1 Iron Gear, 1 Gel Core, 1 Wicked Idol, 1 Blaster",
+"needed":["Light Shard","Sharp Fang","Iron Gear","Gel Core","Wicked Idol","Blaster"],
+"amounts":[10,3,1,1,1,1],
+"crowns":4000
 },"Autogun Recipe":{
 "name":"Autogun Recipe",
 "type":"Recipe",
@@ -363,6 +408,26 @@
 "name":"Frost Gel",
 "type":"Material",
 "description":"A drop of chilly gunk collected from a cool Clockworks customer."
+},"Sinful Brew":{
+"name":"Sinful Brew",
+"type":"Material",
+"description":"A noxious drink favored by all fiends. Despite its prevalence, it's officially outlawed in the Underworld as a marketing ploy."
+},"Brute Core":{
+"name":"Brute Core",
+"type":"Material",
+"description":"An oozing blue lump from a particularly potent gelatinous opponent."
+},"Wicked Idol":{
+"name":"Wicked Idol",
+"type":"Material",
+"description":"One of many statuettes carried by fiends as a means of gaining favor with their dark gods. The most valuable ones are 'MIBE' (mint in box of evil)"
+},"Critter Carapace":{
+"name":"Critter Carapace",
+"type":"Material",
+"description":"A chitinous chunk carefully shucked from a Clockworks creature. It's in surprisingly good shape."
+},"Soul Dust":{
+"name":"Soul Dust",
+"type":"Material",
+"description":"The dust of the departed. Whether it still retains any shred of a soul remains to be seen."
 },"Heart":{
 "name":"Heart",
 "type":"Usable",

@@ -13,8 +13,11 @@
 "Swift Flourish Recipe",
 "Fireburst Brandish Recipe",
 "Iceburst Brandish Recipe",
-"Shockburst Brandish Recipe"],
-"lootWeights":[5,5,5,5,5,5,3,3,3,3,3,3,3],
+"Shockburst Brandish Recipe",
+"Elemental Blaster Recipe",
+"Shadow Blaster Recipe",
+"Pierce Blaster Recipe"],
+"lootWeights":[5,5,5,5,5,5,3,3,3,3,3,3,3,3,3,3],
 "stock":[],
 "amount":5
 },"Dangerroom1":{

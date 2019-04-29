@@ -9,8 +9,8 @@
 "turn":2,
 "art":"https://i.imgur.com/daHaUG3.png",
 "exp":10,
-"lootTable":["Gel Drop", "Gel Core", "Green Shard", "Driftwood", "Light Shard"],
-"lootWeights":[10,5,10,5,10],
+"lootTable":["Gel Drop", "Gel Core", "Green Shard", "Driftwood", "Light Shard","Brute Core"],
+"lootWeights":[10,5,10,5,10,3],
 "location":0,
 "depth":0 
 },"LICHEN":{
@@ -24,8 +24,8 @@
     "turn":2,
     "art":"https://i.imgur.com/VXRNVTG.png",
     "exp":14,
-    "lootTable":["Gel Drop", "Gel Core", "Green Shard", "Driftwood", "Light Shard"],
-    "lootWeights":[10,5,10,5,10],
+    "lootTable":["Gel Drop", "Gel Core", "Green Shard", "Driftwood", "Light Shard","Brute Core"],
+    "lootWeights":[10,5,10,5,10,3],
     "location":0,
     "depth":0  
 },"POLYP":{
@@ -39,8 +39,8 @@
     "turn":1,
     "art":"https://i.imgur.com/daHaUG3.png",
     "exp":10,
-    "lootTable":["Gel Drop", "Gel Core", "Green Shard", "Driftwood", "Light Shard"],
-    "lootWeights":[10,5,10,5,10],
+    "lootTable":["Gel Drop", "Gel Core", "Green Shard", "Driftwood", "Light Shard","Brute Core"],
+    "lootWeights":[10,5,10,5,10,3],
     "location":0,
     "depth":0  
 },"GIANT LICHEN":{
@@ -54,8 +54,8 @@
     "turn":3,
     "art":"https://i.imgur.com/tCXUiaA.png",
     "exp":35,
-    "lootTable":["Gel Drop", "Gel Core", "Green Shard", "Driftwood", "Light Shard"],
-    "lootWeights":[10,5,10,5,10],
+    "lootTable":["Gel Drop", "Gel Core", "Green Shard", "Driftwood", "Light Shard","Brute Core"],
+    "lootWeights":[10,5,10,5,10,3],
     "location":0,
     "depth":0   
 },"JELLY KING":{
@@ -159,8 +159,8 @@
     "turn":2,
     "art":"https://i.imgur.com/ujd3Jr5.png",
     "exp":15,
-    "lootTable":["Dark Shard", "Red Shard", "Brimstone", "Vile Seal","Forbidden Fruit","Phial of Phear"],
-    "lootWeights":[10,10,5,5,3,3],
+    "lootTable":["Dark Shard", "Red Shard", "Brimstone", "Vile Seal","Forbidden Fruit","Phial of Phear","Wicked Idol","Sinful Brew"],
+    "lootWeights":[10,10,5,5,3,3,5,5],
     "location":0,
     "depth":0 
 },"OVERTIMER":{
@@ -174,8 +174,8 @@
     "turn":3,
     "art":"https://i.imgur.com/ujd3Jr5.png",
     "exp":15,
-    "lootTable":["Dark Shard", "Red Shard", "Brimstone", "Vile Seal","Forbidden Fruit","Phial of Phear"],
-    "lootWeights":[10,10,5,5,3,3],
+    "lootTable":["Dark Shard", "Red Shard", "Brimstone", "Vile Seal","Forbidden Fruit","Phial of Phear","Wicked Idol","Sinful Brew"],
+    "lootWeights":[10,10,5,5,3,3,5,5],
     "location":0,
     "depth":0 
 },"WOLVER":{
@@ -189,8 +189,8 @@
     "turn":2,
     "art":"https://i.imgur.com/1RHk2G3.png",
     "exp":15,
-    "lootTable":["Red Shard", "Green Shard", "Beast Scale", "Sharp Fang","Monster Bone"],
-    "lootWeights":[10,10,5,5,5],
+    "lootTable":["Red Shard", "Green Shard", "Beast Scale", "Sharp Fang","Monster Bone","Critter Carapace"],
+    "lootWeights":[10,10,5,5,5,5],
     "location":0,
     "depth":0 
 },"CHROMALISK":{
@@ -204,8 +204,8 @@
     "turn":3,
     "art":"https://i.imgur.com/Ot37ETu.png",
     "exp":15,
-    "lootTable":["Red Shard", "Green Shard", "Beast Scale", "Sharp Fang","Monster Bone"],
-    "lootWeights":[10,10,5,5,5],
+    "lootTable":["Red Shard", "Green Shard", "Beast Scale", "Sharp Fang","Monster Bone","Critter Carapace"],
+    "lootWeights":[10,10,5,5,5,5],
     "location":0,
     "depth":0 
 },"ALPHA WOLVER":{
@@ -219,8 +219,8 @@
     "turn":3,
     "art":"https://i.imgur.com/pudlHdt.png",
     "exp":25,
-    "lootTable":["Red Shard", "Green Shard", "Beast Scale", "Sharp Fang","Monster Bone"],
-    "lootWeights":[10,10,5,5,5],
+    "lootTable":["Red Shard", "Green Shard", "Beast Scale", "Sharp Fang","Monster Bone","Critter Carapace"],
+    "lootWeights":[10,10,5,5,5,5],
     "location":0,
     "depth":0 
 },"TROJAN":{
@@ -234,8 +234,8 @@
     "turn":4,
     "art":"https://i.imgur.com/jq5zOI7.png",
     "exp":50,
-    "lootTable":["Dark Shard", "Red Shard", "Brimstone", "Vile Seal","Forbidden Fruit","Phial of Phear"],
-    "lootWeights":[10,10,5,5,3,3],
+    "lootTable":["Dark Shard", "Red Shard", "Brimstone", "Vile Seal","Forbidden Fruit","Phial of Phear","Wicked Idol"],
+    "lootWeights":[10,10,5,5,3,3,5],
     "location":0,
     "depth":0 
 },"TREASURE":{
@@ -384,8 +384,8 @@
     "turn":4,
     "art":"https://i.imgur.com/foHwvzi.png",
     "exp":20,
-    "lootTable":["Dark Shard", "Light Shard", "Ecto Drop","Vile Seal","Grave Soil","Owlite Feather"],
-    "lootWeights":[10,10,5,5,5,5],
+    "lootTable":["Dark Shard", "Light Shard", "Ecto Drop","Vile Seal","Grave Soil","Owlite Feather","Soul Dust"],
+    "lootWeights":[10,10,5,5,5,5,3],
     "location":0,
     "depth":0 
 },"SPOOKAT":{
@@ -399,8 +399,8 @@
     "turn":3,
     "art":"https://i.imgur.com/dC5IQsl.png",
     "exp":19,
-    "lootTable":["Dark Shard", "Light Shard", "Ecto Drop","Vile Seal","Grave Soil","Owlite Feather"],
-    "lootWeights":[10,10,5,5,5,5],
+    "lootTable":["Dark Shard", "Light Shard", "Ecto Drop","Vile Seal","Grave Soil","Owlite Feather","Soul Dust"],
+    "lootWeights":[10,10,5,5,5,5,3],
     "location":0,
     "depth":0 
 },"HOWLITZER":{
@@ -414,8 +414,8 @@
     "turn":2,
     "art":"https://i.imgur.com/foHwvzi.png",
     "exp":50,
-    "lootTable":["Dark Shard", "Light Shard", "Ecto Drop","Vile Seal","Grave Soil","Owlite Feather"],
-    "lootWeights":[10,10,5,5,5,5],
+    "lootTable":["Dark Shard", "Light Shard", "Ecto Drop","Vile Seal","Grave Soil","Owlite Feather","Soul Dust"],
+    "lootWeights":[10,10,5,5,5,5,3],
     "location":0,
     "depth":0 
 }   
