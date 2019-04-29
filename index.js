@@ -22,15 +22,15 @@ var
 const fs = require('fs');
 
 let userData = JSON.parse(fs.readFileSync('.data/userData.json','utf8')); // Player Stats
-let monsters = JSON.parse(fs.readFileSync('.data/monsters.json','utf8')); //Read Only
+let monsters = JSON.parse(fs.readFileSync('configuration/monsters.json','utf8')); //Read Only
 let enemies = JSON.parse(fs.readFileSync('.data/enemyInstance.json','utf8')); //Active Enemies
-let dungeons = JSON.parse(fs.readFileSync('.data/dungeons.json',"utf8")); //Read Only
+let dungeons = JSON.parse(fs.readFileSync('configuration/dungeons.json',"utf8")); //Read Only
 let dungeon = JSON.parse(fs.readFileSync('.data/dungeonInstance.json',"utf8")); //Active Dungeon
-let scenarios = JSON.parse(fs.readFileSync('.data/scenarios.json',"utf8")); //Read Only
-let items = JSON.parse(fs.readFileSync('.data/items.json',"utf8")); //Read Only
-let rooms = JSON.parse(fs.readFileSync('.data/rooms.json',"utf8")); //Read Only
+let scenarios = JSON.parse(fs.readFileSync('configuration/scenarios.json',"utf8")); //Read Only
+let items = JSON.parse(fs.readFileSync('configuration/items.json',"utf8")); //Read Only
+let rooms = JSON.parse(fs.readFileSync('configuration/rooms.json',"utf8")); //Read Only
 let gate = JSON.parse(fs.readFileSync('.data/gate.json',"utf8")); //Checking if it's time for a new gate.
-let status = JSON.parse(fs.readFileSync('.data/status.json',"utf8")); //Statuses!
+let status = JSON.parse(fs.readFileSync('configuration/status.json',"utf8")); //Statuses!
 let auctions = JSON.parse(fs.readFileSync('.data/auctions.json',"utf8")); //Checking if it's time for a new gate.
 
 const prefix = "!";
