@@ -21,23 +21,23 @@ var
 
 const fs = require('fs');
 
-let userData = JSON.parse(fs.readFileSync('.data/userData.json','utf8')); // Player Stats
+let userData = JSON.parse(fs.readFileSync('game/userData.json','utf8')); // Player Stats
 let monsters = JSON.parse(fs.readFileSync('configuration/monsters.json','utf8')); //Read Only
-let enemies = JSON.parse(fs.readFileSync('.data/enemyInstance.json','utf8')); //Active Enemies
+let enemies = JSON.parse(fs.readFileSync('game/enemyInstance.json','utf8')); //Active Enemies
 let dungeons = JSON.parse(fs.readFileSync('configuration/dungeons.json',"utf8")); //Read Only
-let dungeon = JSON.parse(fs.readFileSync('.data/dungeonInstance.json',"utf8")); //Active Dungeon
+let dungeon = JSON.parse(fs.readFileSync('game/dungeonInstance.json',"utf8")); //Active Dungeon
 let scenarios = JSON.parse(fs.readFileSync('configuration/scenarios.json',"utf8")); //Read Only
 let items = JSON.parse(fs.readFileSync('configuration/items.json',"utf8")); //Read Only
 let rooms = JSON.parse(fs.readFileSync('configuration/rooms.json',"utf8")); //Read Only
-let gate = JSON.parse(fs.readFileSync('.data/gate.json',"utf8")); //Checking if it's time for a new gate.
+let gate = JSON.parse(fs.readFileSync('game/gate.json',"utf8")); //Checking if it's time for a new gate.
 let status = JSON.parse(fs.readFileSync('configuration/status.json',"utf8")); //Statuses!
-let auctions = JSON.parse(fs.readFileSync('.data/auctions.json',"utf8")); //Checking if it's time for a new gate.
+let auctions = JSON.parse(fs.readFileSync('game/auctions.json',"utf8")); //Checking if it's time for a new gate.
 
 const prefix = "!";
 var commands = ["PREFIX = !", "info version", "fight {enemyname}", "forward","check {object}","inventory", "inventory stats", ];
 var downTime = 10;
 const resources = "https://imgur.com/a/htUgqoA";
-var version = "Beta 1.0.0";
+var version = "Beta 1.1.0";
 var maxDepth = 28;
 var crowns = [5,10,15,25,50,100]
 var crownWeights = [20,10,10,5,5,2];
@@ -55,7 +55,9 @@ var buyEmoji = "569973669376426000";
 
 
 bot.on('ready', () => {
-    console.log('The Arcade is up and running.')
+    console.log('The Arcade is up and running');
+    var channel = bot.channels.get("569295829987360768");
+    channel.send('The Arcade has rebooted.');  
 })
 
 setInterval(function() {
@@ -72,7 +74,7 @@ function Update(){
             if(auctions[key].time <= 0){
                 UpdateAuction(key,auctions[key].time,auctions[key].bid);
             }
-            fs.writeFile('.data/auctions.json', JSON.stringify(auctions), (err) =>{
+            fs.writeFile('game/auctions.json', JSON.stringify(auctions), (err) =>{
                 if (err) console.error(err);
             })   
         }      
@@ -231,7 +233,7 @@ function GetTheme(){
     //Our new combination!
     var newCombination = [newFamily,newStatus];
 
-    //////console.log("This gate's theming is... ",newCombination);
+    console.log("This gate's theming is... ",newCombination);
     return newCombination;
 }
 function Gate(){
@@ -259,7 +261,9 @@ function Gate(){
         for (var key in dungeon.depth){        
             var chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
             if(!dungeons[chosenArea].theme.includes("any")){
+                console.log(chosenArea);
                 while(!dungeons[chosenArea].theme.includes(newTheme[0])){
+                  console.log(chosenArea);
                     chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
                 }
             }
@@ -423,6 +427,12 @@ function UseItem(object,player){
         userData[player].health = userData[player].maxHealth;
     } else if(items[object].name === "Health Capsule"){
         userData[player].health += 10;
+    } else if (items[object].name === "Tier 2 Warp Ticket"){
+        userData[player].location = 0;
+        userData[player].depth = 9;
+    } else if (items[object].name === "Tier 3 Warp Ticket"){
+        userData[player].location = 0;
+        userData[player].depth = 19;
     }
     //Vials should be thrown at enemies and do status and damage.
     //Barriers should do damage per turn.
@@ -592,17 +602,22 @@ function Forward(player){
     if(myEnemy.health <= 0 && rooms[dungeon.depth[userData[player].depth].currentrooms[userData[player].location]].type === "battle"){
         //console.log("New Monster " + monsters[newMob].name);
         myEnemy = monsters[newMob];
-        if(userData[player].depth < 18){
+        if(userData[player].depth < 8){
             myEnemy.health = Math.floor(monsters[newMob].max * userData[player].depth/4);
             if(myEnemy.health <= 0){
                 myEnemy.health = 1;
             }
-        } else {
-            myEnemy.health = Math.floor((monsters[newMob].max * userData[player].depth/4) * 2);
+        } else if (userData[player].depth < 18 && userData[player].depth > 8){
+            myEnemy.health = Math.floor((monsters[newMob].max * userData[player].depth/3));
             if(myEnemy.health <= 0){
                 myEnemy.health = 1;
             }
-        }  
+        } else {
+          myEnemy.health = Math.floor((monsters[newMob].max * userData[player].depth/2));
+            if(myEnemy.health <= 0){
+                myEnemy.health = 1;
+            }
+        }
         myEnemy.turn = monsters[newMob].attackSpeed;
         myEnemy.attackSpeed = monsters[newMob].attackSpeed;
         for(var key in status){
@@ -918,7 +933,7 @@ function Special(player){
                     }
                     for(var key in userData){
                         if(userData[key].location === userData[player].location && userData[key].depth === userData[player].depth){
-                            PartyAction(embed,key);
+                            PartyAction(special,key);
                         }
                     }
                 } else {
@@ -949,18 +964,21 @@ function Inventory(player){
         var weapons = [];
         var recipes = [];
         var minerals = [];
+        var trinkets = [];
         for(var key in userData[player].items) {
             if(userData[player].items[key].amount > 0){
                 if(items[key].type === "Material"){
                     materials.push(userData[player].items[key].amount + " " + userData[player].items[key].name);
                 } else if (items[key].type === "Sword" || items[key].type === "Gun"){
-                    weapons.push(userData[player].items[key].amount + " " + userData[player].items[key].name);
+                    weapons.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
                 } else if(items[key].type === "Usable"){
-                    usables.push(userData[player].items[key].amount + " " + userData[player].items[key].name);
+                    usables.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
                 } else if (items[key].type === "Recipe"){
-                    recipes.push(userData[player].items[key].amount + " " + userData[player].items[key].name);
+                    recipes.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
                 } else if (items[key].type === "Mineral"){
-                    minerals.push(userData[player].items[key].amount + " " + userData[player].items[key].name);
+                    minerals.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
+                } else if (items[key].type === "Trinket"){
+                    trinkets.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
                 }
                 //console.log(userData[player].items[key])
             }  
@@ -980,38 +998,44 @@ function Inventory(player){
         if(minerals.length === 0){
             minerals.push("Nothing");
         }
+        if(trinkets.length === 0){
+            trinkets.push("Nothing");
+        }
         materials.sort();
         usables.sort();
         weapons.sort();
         recipes.sort();
         minerals.sort();
+        trinkets.sort();
         inv.setTitle(userData[player].name + "'s Inventory")
         inv.addField('Crowns', userData[player].crowns)
         inv.addField('Weapons', weapons)  
+        inv.addFIeld('Trinkets',trinkets)
         inv.addField('Materials', materials)  
         inv.addField('Minerals', minerals)
         inv.addField('Usables', usables)  
         inv.addField('Recipes', recipes)  
-        inv.addField('Equipped', userData[player].equipped)    
+        inv.addField('Equipped Weapon', userData[player].equipped)    
+        inv.addField('Equipped Trinket', userData[player].trinket.name)
        // inv.setThumbnail(message.author.avatarURL)
         inv.setColor(0xFCF200)
     
     PartyAction(inv,player); 
 }
 function SaveData(){
-    fs.writeFile('.data/userData.json', CircularJSON.stringify(userData), (err) =>{
+    fs.writeFile('game/userData.json', CircularJSON.stringify(userData), (err) =>{
         if (err) console.error(err);
     })
-    fs.writeFile('.data/enemyInstance.json', JSON.stringify(enemies), (err) =>{
+    fs.writeFile('game/enemyInstance.json', JSON.stringify(enemies), (err) =>{
         if (err) console.error(err);
     }) 
-    fs.writeFile('.data/dungeonInstance.json', JSON.stringify(dungeon), (err) =>{
+    fs.writeFile('game/dungeonInstance.json', JSON.stringify(dungeon), (err) =>{
         if (err) console.error(err);
     })
-    fs.writeFile('.data/gate.json', JSON.stringify(gate), (err) =>{
+    fs.writeFile('game/gate.json', JSON.stringify(gate), (err) =>{
         if (err) console.error(err);
     })
-    fs.writeFile('.data/auctions.json', JSON.stringify(auctions), (err) =>{
+    fs.writeFile('game/auctions.json', JSON.stringify(auctions), (err) =>{
         if (err) console.error(err);
     })
 }
@@ -1073,7 +1097,7 @@ function PartyAction(action, player){
     channel.send("Please type in the channel that your party instance is in.");
 }}
 function Log(action){
-    var path = '.data/log.txt';
+    var path = 'game/log.txt';
     var currentdate = new Date(); 
     var datetime = "Time: " + currentdate.getDate() + "/"
                 + (currentdate.getMonth()+1)  + "/" 
@@ -1331,8 +1355,13 @@ bot.on('message', message=> {
                     message.author.send("Equipped " + item)
                     Inventory(player);
                     Log(userData[player].name + " has equipped " + item);
+                } else if (items[item].type === "Trinket"){
+                    userData[player].trinket = items[item];
+                    message.author.send("Equipped " + item)
+                    Inventory(player);
+                    Log(userData[player].name + " has equipped " + item);
                 } else {
-                    message.author.send("This is not a weapon.")
+                    message.author.send("This is not a weapon or trinket.")
                 }
                 
             } else if (userData[player].equipped === item){
@@ -1591,7 +1620,7 @@ bot.on('message', message=> {
             if(args[1] === "private"){
                 var server = message.guild;
                 var name = message.author.username;
-                let playerRole = message.guild.roles.find('name', name);
+                let playerRole = message.guild.roles.find(x => x.name === name);
                 let playerChannel = message.guild.channels.get(userData[player].partyChannel);
                 
                 if(playerRole != null){
@@ -1599,9 +1628,11 @@ bot.on('message', message=> {
                     playerRole.delete();
                     message.author.send("Deleting old party...")
                 }
-                let everyone = message.guild.roles.find('name', "@everyone");
-                let botAdmin = message.guild.roles.find('name', 'Bot Admin');
-                message.guild.createRole(name,name).then (newRole =>{
+                let everyone = message.guild.roles.find(x => x.name === "@everyone");
+                let botAdmin = message.guild.roles.find(x => x.name === "Bot Admin");
+                message.guild.createRole({
+                    name: message.author.username,
+                }).then (newRole =>{
                     server.createChannel(name, "text").then (myServer =>{
                     myServer.overwritePermissions(everyone,{
                         VIEW_CHANNEL: false,
@@ -1618,7 +1649,7 @@ bot.on('message', message=> {
                         SEND_MESSAGES: true,
                         READ_MESSAGE_HISTORY: true,
                     })
-                    newRole.setName(name, "text");
+                   
                     message.member.addRole(newRole);
                     embed.setTitle(userData[player].name + "'s instance")
                         myServer.send(embed).then  (async function (sentEmbed) {
@@ -1748,6 +1779,19 @@ bot.on('message', message=> {
                 message.author.send("You do not have the neccessary roles.");
             }     
         message.delete();
+        break;
+        case 'bot':
+        if(message.member.roles.has(myRole)){
+                if(!args[1]){
+                    message.author.send("Invalid Arguments.");
+                    return;
+                }
+                var myChannel = bot.channels.get("569295829987360768");
+                myChannel.send(args);
+            } else {
+                message.author.send("You do not have the neccessary roles.");
+            }  
+            message.delete();
         break;
         case 'check':
             if (userData[player].partyChannel != message.channel.id) {
