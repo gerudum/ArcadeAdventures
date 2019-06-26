@@ -1,0 +1,198 @@
+{"bonus":{
+    "loot":["Spark of Life","Health Capsule","Tier 2 Warp Ticket", "Tier 3 Warp Ticket","Silver Key","Copper Lockbox","Gold Lockbox","Silver Lockbox","Steel Lockbox"],
+    "weights":[2,6,3,3,2,2,2,2,2]
+    },"Copper Lockbox":{
+    "loot":["Quick Strike Module","Elite Quick Strike Module","Sword Focus Module","Elite Sword Focus Module","Slash Module","Elite Slash Module"],
+    "weights":[5,1,5,1,5,1]
+    },"Gold Lockbox":{
+    "loot":["Quick Draw Module","Elite Quick Draw Module","Handgun Focus Module","Elite Handgun Focus Module","Trueshot Module","Elite Trueshot Module"],
+    "weights":[5,1,5,1,5,1]
+    },"Silver Lockbox":{
+    "loot":["Flawed Orb of Alchemy","Simple Orb of Alchemy","Advanced Orb of Alchemy","Elite Orb of Alchemy","Eternal Orb of Alchemy"],
+    "weights":[5,4,3,2,1]
+    },"Steel Lockbox":{
+    "loot":["Heart Pendant","Dual Heart Pendant","Tri Heart Pendant","Tetra Heart Pendant","Penta Heart Pendant"],
+    "weights":[5,4,3,2,1]
+    },"Titanium Lockbox":{
+    "loot":[],
+    "weights":[]
+    },"DesertFlavor":{
+    "loot":["The heat of the desert is sweltering, but you keep pushing forward.", "The trek continues...","Staying out in this heat too long may result in burns, pressing on...","The desert seems endless, no town or rest place in sight.","Legends have foretold of an ancient treasure hidden within the ruins of this desert...","The sun shines vibrantly in the sky, will it ever set?","True adventurers never give up!  Pressing onward!"],
+    "weights":[5,5,5,5,5,5,5]
+    },"Ruins1":{
+    "loot":["Ancient Fragment 1"],
+    "weights":[10]
+    },"Ruins2":{
+    "loot":["Ancient Fragment 2"],
+    "weights":[10]
+    },"Ruins3":{
+    "loot":["Ancient Fragment 3"],
+    "weights":[10]
+    },"Ruins4":{
+    "loot":["Ancient Fragment 4"],
+    "weights":[10]
+    },"Ruins5":{
+    "loot":["Ancient Fragment 5"],
+    "weights":[10]
+    },"Ruins6":{
+    "loot":["Golden Chest"],
+    "weights":[10]
+    },"Golden Chest":{
+    "loot":["Sealed Sword"],
+    "weights":[10]
+    },"RuinsBattle1":{
+    "loot":["ANCIENT TROJAN"],
+    "weights":[10]
+    },"RuinsBattle2":{
+    "loot":["ANCIENT LUMBER"],
+    "weights":[10]
+    },"RuinsBattle3":{
+    "loot":["TORTODRONE"],
+    "weights":[10]
+    },"Slime Lockbox":{
+    "loot":["Heart Pendant","Dual Heart Pendant","Tri Heart Pendant","Tetra Heart Pendant","Penta Heart Pendant"],
+    "weights":[5,4,3,2,1]
+    },"Crowns":{
+    "loot":[5,10,15,20,25,50,100,200],
+    "weights":[5,5,5,3,3,2,2,2]    
+    },"Heat":{
+    "loot":[5,10,15,20,25,50,100],
+    "weights":[5,5,5,3,3,2,2]  
+    },"Orb":{
+    "loot":["Flawed Orb of Alchemy","Simple Orb of Alchemy","Advanced Orb of Alchemy","Elite Orb of Alchemy","Eternal Orb of Alchemy"],
+    "weights":[20,20,20,20,20]  
+    },"Crystal":{
+    "loot":["Cracked Fire Crystal","Dim Fire Crystal","Warm Fire Crystal","Glowing Fire Crystal","Shining Fire Crystal","Radiant Fire Crystal"],
+    "weights":[15,10,7,5,3,2]
+    },"Unique Variant":{
+    "loot":["Damage Bonus","Attack Speed Increase","Charge Time Reduction"],
+    "weights":[6,1,1]    
+    },"Unique Variant Rank":{
+    "loot":["Low","Medium","High","Very High"],
+    "weights":[10,5,3,2]    
+    },"Unique Variant Family":{
+    "loot":["Slime","Gremlin","Construct","Beast","Fiend","Undead"],
+    "weights":[1,1,1,1,1,1]   
+    },"Golden Slime Wheel":{
+    "loot":["Dim Fire Crystal","Warm Fire Crystal","Glowing Fire Crystal","Shining Fire Crystal","Radiant Fire Crystal","Flawed Orb of Alchemy","Simple Orb of Alchemy","Advanced Orb of Alchemy","Elite Orb of Alchemy","Eternal Orb of Alchemy","Slime Key","Slime Lockbox"],
+    "weights":[10,9,8,4,4,10,9,8,4,4,4,4]   
+    },"Golden Slime Wheel Multiplier":{
+    "loot":[0,2,4,6,10,12,24,50,100,200],
+    "weights":[70,60,50,40,30,20,10,5,2,1]     
+    },"Summoning":{
+    "loot":["Vile Seal","TROJAN","DEVILITE","GREAVER","OVERTIMER","GORGO","Shadow Steel"],
+    "weights":[10,9,8,7,6,5,4]
+    },"Mecha Knight":{
+    "loot":["Mecha Knight"],
+    "weights":[10]
+    },"Obelisk":{
+    "loot":["ZOMBIE","KAT","DEADNAUGHT","Death","Fortune"],
+    "weights":[10,10,10,10,5]    
+    },"basil":{
+    "loot":["Brandish Recipe",
+        "Flourish Recipe",
+        "Calibur Recipe",
+        "Prismatech Alchemer Recipe",
+        "Blaster Recipe",
+        "Autogun Recipe",
+        "Needleshot Recipe",
+        "Nightblade Recipe",
+        "Magnus Recipe",
+        "Swift Flourish Recipe",
+        "Fireburst Brandish Recipe",
+        "Iceburst Brandish Recipe",
+        "Shockburst Brandish Recipe",
+        "Elemental Blaster Recipe",
+        "Shadow Blaster Recipe",
+        "Pierce Blaster Recipe",
+        "Silent Nightblade Recipe",
+        "Mega Magnus Recipe",
+        "Prisma Driver Recipe",
+        "Grand Flourish Recipe",
+        "Blazebrand Recipe",
+        "Strike Needle Recipe",
+        "Callahan Recipe",
+        "Iron Slug Recipe",
+        "Blitz Needle Recipe",
+        "Combuster Recipe",
+        "Final Flourish Recipe",
+        "Nova Driver Recipe",
+        "Prismatech Alchemer 2",
+        "Acheron Recipe",
+        "Wrench Wand Recipe",
+        "Blizzbrand Recipe",
+        "Glacius Recipe",
+        "Voltedge Recipe",
+        "Boltbrand Recipe"],
+    "weights":[5,5,5,5,5,5,3,3,3,3,3,3,3,3,3,3,2,2,2,2,2,2,1,1,1,1,1,1,3,1,3,3,1,3,1]  
+    },"grasil":{
+    "loot":["Autogun","Brandish","Calibur","Blaster","Alchemer","Flourish","Wrench Wand"],
+    "weights":[5,5,5,5,5,5,5]  
+    },"fire":{
+    "loot":["Blast Powder","Fuel Canister","Torchstone","Blaze Pepper","Flame Soul"],
+    "weights":[10,10,10,5,5]     
+    },"shock":{
+    "loot":["Static Clinger","Power Cell","Volt Oil","Thunderball","Storm Chaser"],
+    "weights":[10,10,10,5,5]     
+    },"freeze":{
+    "loot":["Frost Gel","Hailstone","Cooling Cell","Perfect Snowball","Everfrost"],
+    "weights":[10,10,10,5,5]     
+    },"poison":{
+    "loot":["Waste Module","Toxic Core","Waste Module","Corrosive Acid","Plague Essence"],
+    "weights":[10,10,10,5,5]     
+    },"BEAST":{
+    "loot":["Green Shard","Red Shard","Beast Scale","Sharp Fang","Critter Carapace","Monster Bone","Bushy Tail","Drake Scale","Chroma Tear","Warp Dust","Dragon Scale","Primal Ore"],
+    "weights":[10,10,9,9,7,7,6,6,5,5,3,3]     
+    },"CONSTRUCT":{
+    "loot":["Blue Shard","Light Shard","Scrap Metal","Spark Plug","Iron Gear","Swordstone","Force Dynamo","Rocket Sprocket","Heavy Gear","Silver Coil","Plasma Cell","Sun Silver"],
+    "weights":[10,10,9,9,7,7,6,6,5,5,3,3]       
+    },"SLIME":{
+    "loot":["Green Shard","Light Shard","Gel Drop","Sharp Fang","Driftwood","Gel Core","Brute Core","Redwood","Ironwood","Rocky Core","Royal Core","Royal Skewer"],
+    "weights":[10,10,9,9,7,7,6,6,5,5,3,3]      
+    },"FIEND":{
+    "loot":["Dark Shard","Red Shard","Brimstone","Vile Seal","Forbidden Fruit","Sinful Brew","Phial of Phear","Wicked Idol","Mug of Misery","Trojan Horseshoe","Crest of Ur","Shadow Steel"],
+    "weights":[10,10,9,9,7,7,6,6,5,5,3,3]       
+    },"UNDEAD":{
+    "loot":["Dark Shard","Light Shard","Ecto Drop","Vile Seal","Grave Soil","Owlite Feather","Dead Gold","Soul Dust","Blighted Bone","Ghost Bell","Philoso Feather","Reaper Rib"],
+    "weights":[10,10,9,9,7,7,6,6,5,5,3,3]       
+    },"GREMLIN":{
+    "loot":["Blue Shard","Red Shard","Bronze Bolt","Spark Plug","Frayed Fabric","Gremlin Gizmo","Fine Fabric","Unstable Core","Meteor Mote","Miracloth","Silverweave","Volcanic Iron"],
+    "weights":[10,10,9,9,7,7,6,6,5,5,3,3]       
+    },"treasure":{
+    "loot":["Crowns"],
+    "weights":[10]       
+    },"crimsonite":{
+    "loot":["Crimsonite"],
+    "weights":[10]      
+    },"darkmatter":{
+    "loot":["Dark Matter"],
+    "weights":[10]      
+    },"luminite":{
+    "loot":["Luminite"],
+    "weights":[10]      
+    },"moonstone":{
+    "loot":["Moonstone"],
+    "weights":[10]       
+    },"valestone":{
+    "loot":["Valestone"],
+    "weights":[10]        
+    },"dreamstone":{
+    "loot":["Dreamstone"],
+    "weights":[10]    
+    },"battlepod":{
+    "loot":["Titanium Core"],
+    "weights":[10]    
+    },"dragon":{
+    "loot":["Alpha Core"],
+    "weights":[10]    
+    },"depthscale":{
+        "1":1,
+        "2":1.25,
+        "3":1.5,
+        "4":2,
+        "5":3.25,
+        "6":3.5,
+        "7":5,
+        "8":9
+    }
+}

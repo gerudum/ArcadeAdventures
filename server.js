@@ -3,8 +3,11 @@ const bot = new Discord.Client();
 const http = require('http');
 const express = require('express');
 const app = express();
+
+const tools = require('./tools.js');
+
 app.get("/", (request, response) => {
-  console.log(Date.now() + " Ping Received");
+  //console.log(Date.now() + " Ping Received");
   response.sendStatus(200);
 });
 app.listen(process.env.PORT);
@@ -12,52 +15,72 @@ setInterval(() => {
   http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
 }, 280000);
 
-
-var
-  CircularJSON = require('circular-json'),
-  obj = { foo: 'bar' },
-  str
-;
-
 const fs = require('fs');
 
-let userData = JSON.parse(fs.readFileSync('game/userData.json','utf8')); // Player Stats
+
+let party = JSON.parse(fs.readFileSync('.data/instance.json','utf8')); //party
+let user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stats
 let monsters = JSON.parse(fs.readFileSync('configuration/monsters.json','utf8')); //Read Only
-let enemies = JSON.parse(fs.readFileSync('game/enemyInstance.json','utf8')); //Active Enemies
+let enemies = JSON.parse(fs.readFileSync('.data/enemyInstances.json','utf8')); //Active Enemies
 let dungeons = JSON.parse(fs.readFileSync('configuration/dungeons.json',"utf8")); //Read Only
-let dungeon = JSON.parse(fs.readFileSync('game/dungeonInstance.json',"utf8")); //Active Dungeon
+let dungeon = JSON.parse(fs.readFileSync('.data/dungeonInstances.json',"utf8")); //Active Dungeon
 let scenarios = JSON.parse(fs.readFileSync('configuration/scenarios.json',"utf8")); //Read Only
 let items = JSON.parse(fs.readFileSync('configuration/items.json',"utf8")); //Read Only
+let table = JSON.parse(fs.readFileSync('configuration/table.json',"utf8")); //Read Only
 let rooms = JSON.parse(fs.readFileSync('configuration/rooms.json',"utf8")); //Read Only
-let gate = JSON.parse(fs.readFileSync('game/gate.json',"utf8")); //Checking if it's time for a new gate.
+let gate = JSON.parse(fs.readFileSync('.data/gates.json',"utf8")); //Checking if it's time for a new gate.
 let status = JSON.parse(fs.readFileSync('configuration/status.json',"utf8")); //Statuses!
-let auctions = JSON.parse(fs.readFileSync('game/auctions.json',"utf8")); //Checking if it's time for a new gate.
+let auctions = JSON.parse(fs.readFileSync('.data/auctionHouse.json',"utf8")); //Checking if it's time for a new gate.
+let towns = JSON.parse(fs.readFileSync('configuration/towns.json','utf8')); //towns
+let moves = JSON.parse(fs.readFileSync('configuration/moves.json',"utf8"));
+let admin = JSON.parse(fs.readFileSync('.data/admin.json',"utf8"));
 
 const prefix = "!";
 var commands = ["PREFIX = !", "info version", "fight {enemyname}", "forward","check {object}","inventory", "inventory stats", ];
 var downTime = 10;
 const resources = "https://imgur.com/a/htUgqoA";
-var version = "Beta 1.1.0";
-var maxDepth = 28;
-var crowns = [5,10,15,25,50,100]
+var crownLoot = [5,10,15,25,50,100]
 var crownWeights = [20,10,10,5,5,2];
-
+//Emoji IDS
 var fightEmoji = "567468758294200320";
+var supportEmoji = "592488143542812696";
+var chargeEmoji = "592488158118019093";
 var blockEmoji = "567468785670291456";
 var forwardEmoji = "567468996014899240";
 var descendEmoji = "567866647369613341";
 var inventoryEmoji = "567866805763440640";
 var gateEmoji = "567867432300183562";
 var specialEmoji = "572159195932262450";
+var checkEmoji = "575419820825247754";
 var bidEmoji = "569973521124425758";
 var buyEmoji = "569973669376426000";
+var interactEmoji = "580124031571853325";
+var leftpageEmoji = "580905770812702720";
+var rightpageEmoji = "580905793939963932";
 
+var removeEmoji = "592810251255021568";
+var confirmEmoji = "592810232959205398";
 
+var nextEmoji = "592810321828380673";
+var previousEmoji = "592810344439873546";
 
+var increaseEmoji = "592810274373763074";
+var decreaseEmoji = "592810290790531088";
+
+var maxDepth = 38;
+var heat = [0.33,0.43,0.5,0.55,0.6,0.65,0.7,0.85,0.9,1.00,1.00,1.00]
+
+//On Bot Startup
 bot.on('ready', () => {
-    console.log('The Arcade is up and running');
-    var channel = bot.channels.get("569295829987360768");
-    channel.send('The Arcade has rebooted.');  
+    //console.log('The Arcade is up and running');
+    Log("The Arcade has Rebooted.")
+    for (var key in user){
+        if(user[key].party > 0 && user[key].partyChannel != null){
+          if(bot.channels.get(user[key].partyChannel)){
+            RebootInstance(key);
+          }       
+        }
+    }
 })
 
 setInterval(function() {
@@ -67,119 +90,214 @@ setInterval(function() {
 //Update is ran every second.
 function Update(){
     Gate();
-    /*
-    for(var key in auctions){
-        if(auctions[key].time != null){
-            auctions[key].time = auctions[key].time - 1;  
-            if(auctions[key].time <= 0){
-                UpdateAuction(key,auctions[key].time,auctions[key].bid);
-            }
-            fs.writeFile('game/auctions.json', JSON.stringify(auctions), (err) =>{
-                if (err) console.error(err);
-            })   
-        }      
-    }*/
+    Event();
+    Mist();
 }
-function Interact(room,player){
-    const interaction = new Discord.RichEmbed();
-    interaction.setTitle(userData[player].name + "'s Interaction")
-    interaction.addField(room.interaction,"Interesting.")
-    if(room.spawn != null){
-        interaction.addField(room.spawn + " has appeared!", "Oh no!")
-        enemies.depth[userData[player].depth].location[userData[player].location].enemy = {};
-        enemies.depth[userData[player].depth].location[userData[player].location].enemy = monsters[room.spawn];
-        SaveData();
+function Mist(){
+    if(!gate.mist){
+        gate.mist = 600;
     }
-    PartyAction(interaction,player);
-}
-function BidAuction(auction,bid,player){
-    ////console.log("Bid");
-        if(userData[player].crowns >= auctions[auction].minimum){
-           // //console.log("Enough Crowns");
-            
-            if(auctions[auction].bidder === player){
-                userData[player].crowns += auctions[auction].bid;
+    gate.mist -= 1;
+    if(gate.mist <= 0){
+        for(var key in user){
+            user[key].mist += 1;
+            if(user[key].mist > user[key].maxMist){
+                user[key].mist = user[key].maxMist;
             }
-            userData[player].crowns -= bid;
-            auctions[auction].bidder = player;
-            auctions[auction].bid = bid;
-            UpdateAuction(auction,auctions[auction].time,auctions[auction].bid);
         }
-}  
-function GenerateID(){
-    var newID = Math.floor(Math.random() * 100000);
-    ////console.log(newID);
-    return newID;
+        gate.mist = 600;
+    }
 }
-function NewAuction(item,amount,bid,price,time,player){
-        var auction = GenerateID();
-        auctions[auction] = {};
-        auctions[auction].item = item;
-        auctions[auction].amount = amount;
-        auctions[auction].time = time;
-        auctions[auction].bid = bid;
-        auctions[auction].minimum = Math.floor(bid * 1.2);
-        auctions[auction].price = price;
-        auctions[auction].lister = player;
-        auctions[auction].id = auction;
-        
+//#region GateStuff
+//Runs every second.  For events.
+function Event(){
+    if(!gate.event){
+        gate.event = 0;
+        gate.maxEvent = 1800;
+    }
+    gate.event += 1;
+    if(gate.event >= gate.maxEvent){
+        gate.event = 0;
+        Log("An event has occured.")
+        gate.maxEvent = 1800;
+        //Step 1 Get a random depth.
+        var depth = Math.floor(Math.random() * maxDepth);
+        dungeon.depth[depth] = {};
+        var chosenArea = null;
+        //Step 2 Generate a New Dungeon
+        chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
+        while(!dungeons[chosenArea].theme.includes(gate.theme[0]) && !dungeons[chosenArea].theme.includes(gate.theme[1])){
+            //console.log(chosenArea);
+            chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
+        }   
 
-        var auctionHouse = bot.channels.get('569690807913807878');
-        const newAuction = new Discord.RichEmbed()
-        newAuction.setTitle(userData[player].name + "'s Auction")
-        newAuction.addField(amount + " " + item + "(s)" + " is being auctioned for a buy out of " + price,"It currently has a bidding of " + bid + " you must bid a minimum of " + auctions[auction].minimum + " to become top bidder." )
-        newAuction.addField("AUCTION ID: " + auction  , " Use this number to bid on this auction." )
-        auctionHouse.send(newAuction).then ( myAuction => {
-            auctions[auction].instance = myAuction.id;
-        });
-}
-function UpdateAuction(auction,time,bid){
-        //Update bid, time, and minimum bid
-        ////console.log("Update Auction");
-        auctions[auction].time = time;
-        auctions[auction].bid = bid;
-        auctions[auction].minimum = Math.floor(bid * 1.2);
-       
-        const update = new Discord.RichEmbed()
-        update.setTitle(userData[auctions[auction].lister].name + "'s Auction")
-    
-        if(auctions[auction].time <= 0 || auctions[auction].bid >= auctions[auction].price){
-            if(auctions[auction].bidder != null){
-                //Winner!
-                AddItem(auctions[auction].item,auctions[auction].bidder);
-                userData[auctions[auction].lister].items[auctions[auction].item].amount -= auctions[auction].amount;
-                update.addField(userData[auctions[auction].bidder].name + " has won the auction of " + auctions[auction].item + " for " + auctions[auction].bid + " crowns!", "Congratulations!")
-                var auctionHouse = bot.channels.get('569690807913807878');
-                auctionHouse.fetchMessage(auctions[auction].instance). then (instance => {
-                    instance.edit(update);  
-                    auctions[auction] = {};
-                })
-                return;
-            } else {
-                //Unsold...
-                AddItem(auctions[auction].item,auctions[auction].lister);
-                update.addField(userData[auctions[auction].lister].name + "'s item(s) have went unsold.", "Sorry, better luck next time!")
-                var auctionHouse = bot.channels.get('569690807913807878');
-                auctionHouse.fetchMessage(auctions[auction].instance). then (instance => {
-                    instance.edit(update);  
-                    auctions[auction] = {};
-                })   
-                return;
-            }    
-        } else {
-        update.addField(auctions[auction].amount + " " + auctions[auction].item + "(s)" + " is being auctioned for a buy out of " + auctions[auction].price,"It currently has a bidding of " + auctions[auction].bid + " you must bid a minimum of " + auctions[auction].minimum + " to become top bidder." )
-        update.addField("The top bidder is...",userData[auctions[auction].bidder].name)
-        update.addField("AUCTION ID: " +  auctions[auction].id, "Use this to bid on the auction.")
+        enemies.depth[depth] = {};
+        enemies.depth[depth].location = {};
+        dungeon.depth[depth] = GenerateDungeon(chosenArea);
+
+        //Step 3 Set up the enemies
+        for (var i = 0; i < dungeon.depth[depth].currentrooms.length; i++){ 
+            enemies.depth[depth].location[i] = {};   
+            enemies.depth[depth].location[i].enemy = {};
+            enemies.depth[depth].location[i].enemy.health = 0;
         }
-        var auctionHouse = bot.channels.get('569690807913807878');
-        auctionHouse.fetchMessage(auctions[auction].instance). then (instance => {
-            instance.edit(update);  
-        })
+        //Step 4 Make sure players are in the right location
+        for(var key in user){
+            if(user[key].depth === depth){
+                user[key].location = 0;
+            }
+        }
+        var channel = bot.channels.get("579858992814358528");
+        const embed = new Discord.RichEmbed()
+        embed.setTitle("Event!")
+        embed.addField("Depth " + depth + " has become " + dungeon.depth[depth].name + "!","The clockworks is always changing...")
+        channel.send(embed);
+
+    }
 }
-//Should return the theming of the gate.
-//Monster Family and Status.
-//Levels with the "any" theme can be found in any gate.
-//All other levels will be theme specific.
+//Runs every second. For gates.
+function Gate(){
+    gate.lifeTime += 1;
+    gate.maxLife = 14400;
+    if(gate.lifeTime > gate.maxLife){
+        gate.lifeTime = 0;
+      if(!gate.minerals){
+        gate.minerals = {}
+      }
+        var newTheme = GetTheme();
+        gate.theme = newTheme;
+        //console.log(newTheme);
+        gate.minerals["CRIMSONITE"] = 0;
+        gate.minerals["DARK MATTER"] = 0;
+        gate.minerals["LUMINITE"] = 0;
+        gate.minerals["VALESTONE"] = 0;
+        gate.minerals["MOONSTONE"] = 0;
+        gate.minerals["DREAMSTONE"] = 0;
+       //newTheme = ["none","random"];
+      
+        Log("A new gate is being generated.")
+        dungeon.depth = {};
+        for(var i = 0; i < maxDepth; i++){
+            dungeon.depth[i] = {};
+        }    
+        enemies.depth = {};
+        var chosenArea = null;
+        for (var key in dungeon.depth){        
+            chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
+            while(!dungeons[chosenArea].theme.includes(newTheme[0]) && !dungeons[chosenArea].theme.includes(newTheme[1])){
+                //console.log(chosenArea);
+                chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
+            }               
+            
+            enemies.depth[key] = {};
+            enemies.depth[key].location = {};
+            dungeon.depth[key] = GenerateDungeon(chosenArea);
+ 
+            for (var i = 0; i < dungeon.depth[key].currentrooms.length; i++){ 
+                enemies.depth[key].location[i] = {};   
+                enemies.depth[key].location[i].enemy = {};
+                enemies.depth[key].location[i].enemy.health = 0;
+            }
+           
+        } 
+        for (var key in gate.minerals){
+            gate.minerals[key] = 0;
+        }
+        for(var key in user) {
+            user[key].enemy = null;
+            user[key].health = user[key].maxHealth;
+            user[key].opponent = "Nothing";
+            user[key].location = 0;
+            user[key].downTime = false;
+            user[key].depth = 0;
+        } 
+        var channel = bot.channels.get("579858992814358528");
+        var levels = [];
+        const embed = new Discord.RichEmbed()
+        embed.setTitle("Gate Creation")
+        //embed.setThumbnail("https://i.imgur.com/KTD2rHD.png")
+        for (var key in dungeon.depth){
+            levels.push("Depth " + key + ", " + dungeon.depth[key].name);
+        }
+        var stratum1 = [levels[0],levels[1],levels[2],levels[3]];
+        var stratum2 = [levels[4],levels[5],levels[6],levels[7]];
+        var stratum3 = [levels[8],levels[9],levels[10],levels[11],levels[12]];
+        var stratum4 = [levels[13],levels[14],levels[15],levels[16],levels[17]];
+        var stratum5 = [levels[18],levels[19],levels[20],levels[21],levels[22]];
+        var stratum6 = [levels[23],levels[24],levels[25],levels[26],levels[27]];
+        var stratum7 = [levels[28],levels[29],levels[30],levels[31],levels[32]];
+        var stratum8 = [levels[33],levels[34],levels[35],levels[36],levels[37]];
+
+        embed.addField("Stratum 1", stratum1)
+        embed.addField("Stratum 2", stratum2)
+        embed.addField("Stratum 3", stratum3)
+        embed.addField("Stratum 4", stratum4)
+        embed.addField("Stratum 5", stratum5)
+        embed.addField("Stratum 6", stratum6)
+        embed.addField("Stratum 7", stratum7)
+        embed.addField("Stratum 8", stratum8)
+        embed.addField("The theme is " + gate.theme[0] + " " + gate.theme[1],"Interesting")
+        embed.setColor(0xFCF200)
+        channel.send(embed);
+    }
+}
+//Check Gate Map
+function CheckGate(player){
+    Log(user[player].name + " is checking the gate.");
+    var players = [];
+    var yourEnemy = enemies.depth[user[player].depth].location[user[player].location].enemy;
+    for(var key in user){
+        if(user[key].location === user[player].location && user[key].name != user[player].name && user[key].depth === user[player].depth){
+            players.push(user[key].name)
+        }
+    }
+    if(players.length === 0){
+        players.push("nobody");
+    }
+
+    var levels = [];
+        for (var key in dungeon.depth){
+            levels.push("Depth " + key + ", " + dungeon.depth[key].name);    
+        }
+        var stratum1 = [levels[0],levels[1],levels[2],levels[3]];
+        var stratum2 = [levels[4],levels[5],levels[6],levels[7]];
+        var stratum3 = [levels[8],levels[9],levels[10],levels[11],levels[12]];
+        var stratum4 = [levels[13],levels[14],levels[15],levels[16],levels[17]];
+        var stratum5 = [levels[18],levels[19],levels[20],levels[21],levels[22]];
+        var stratum6 = [levels[23],levels[24],levels[25],levels[26],levels[27]];
+        var stratum7 = [levels[28],levels[29],levels[30],levels[31],levels[32]];
+        var stratum8 = [levels[33],levels[34],levels[35],levels[36],levels[37]];
+        
+    var minerals = [];
+        for (var key in gate.minerals){
+            minerals.push(key  + ": " + gate.minerals[key]);
+        }
+
+    const embed = new Discord.RichEmbed()
+        embed.setTitle("Gate")
+        embed.addField("The current dungeon is " + dungeon.depth[user[player].depth].name, "You have reached room " + (user[player].location + 1) + " out of " + dungeon.depth[user[player].depth].currentrooms.length + " of this dungeon.")
+        if(yourEnemy != null){
+            embed.addField("You are currently facing off against " + yourEnemy.name , "It has " + yourEnemy.health + " health remaining.")
+        }
+        embed.addField("You are at depth: " + user[player].depth + " of the current gate", "You have quite a ways to go.")
+        embed.addField("There is " + Math.floor((gate.maxLife - gate.lifeTime)/60) + " minutes remaining before the next gate", "You are with " + players)
+        if(minerals.length <= 0){
+            minerals.push("None, be the first to input minerals!");
+        } 
+        embed.addField("Deposited minerals", minerals)
+        embed.addField("Stratum 1", stratum1)
+        embed.addField("Stratum 2", stratum2)
+        embed.addField("Stratum 3", stratum3)
+        embed.addField("Stratum 4", stratum4)
+        embed.addField("Stratum 5", stratum5)
+        embed.addField("Stratum 6", stratum6)
+        embed.addField("Stratum 6", stratum7)
+        embed.addField("Stratum 6", stratum8)
+        embed.addField("The theme is " + gate.theme[0] + " " + gate.theme[1],"Interesting")
+        //embed.setThumbnail("https://i.imgur.com/KTD2rHD.png")
+    StatusAction(embed,player);
+}
+//Get theme of the gate.
 function GetTheme(){
     //Get the minerals
     var crimsonite = gate.minerals["CRIMSONITE"];
@@ -191,7 +309,7 @@ function GetTheme(){
     //Possible Themes
     var beast = crimsonite + valestone;
     var slime = valestone + luminite;
-    var gremlin = crimsonite + moonstone;
+    var gremlin = crimsonite +  moonstone;
     var construct = moonstone + luminite;
     var fiend = crimsonite + darkmatter;
     var undead = luminite + darkmatter;
@@ -201,306 +319,145 @@ function GetTheme(){
     var shock = moonstone + darkmatter;
 
     //Get the highest number and that's the chosen theme.
-    var families = [beast,slime,gremlin,construct,fiend,undead];
-    //////console.log(families);
-    var newFamily = Math.max(...families);
-    var status = [fire,freeze,poison,shock];
-    var newStatus = Math.max(...status);
-    if(beast === newFamily && slime === newFamily && gremlin === newFamily && construct === newFamily && fiend === newFamily && undead == newFamily){
-        newFamily = "random";
-    } else if(beast === newFamily){
-        newFamily = "beast";
-    } else if (slime === newFamily){
-        newFamily = "slime";
-    } else if (gremlin === newFamily){
-        newFamily = "gremlin";
-    } else if (construct === newFamily){
-        newFamily = "construct";
-    } else if (fiend === newFamily){
-        newFamily = "fiend";
-    } else if (undead === newFamily){
-        newFamily = "undead";
-    }
-    if(fire === newStatus){
-        newStatus = "fire";
-    } else if(freeze === newStatus){
-        newStatus = "freeze";
-    } else if (poison === newStatus){
-        newStatus = "poison";
-    } else if(shock === newStatus){
-        newStatus = "shock";
-    }
-    //Our new combination!
-    var newCombination = [newFamily,newStatus];
+    var themes = [beast,slime,gremlin,construct,fiend,undead,fire,freeze,poison,shock];
+    ////////console.log(themes);
+    var newTheme = Math.max(...themes);
+    if(beast === newTheme && slime === newTheme && gremlin === newTheme && construct === newTheme && fiend === newTheme && undead == newTheme && fire === newTheme && freeze === newTheme && shock === newTheme && poison === newTheme){
+        newTheme = ["random","none"];
+    } else if(beast === newTheme){
+        newTheme = ["beast","none"];
+    } else if (slime === newTheme){
+        newTheme = ["slime","none"];
+    } else if (gremlin === newTheme){
+        newTheme = ["gremlin","none"];
+    } else if (construct === newTheme){
+        newTheme = ["construct","none"];
+    } else if (fiend === newTheme){
+        newTheme = ["fiend","none"];
+    } else if (undead === newTheme){
+        newTheme = ["undead","none"];
+    } else if (fire === newTheme){
+        newTheme = ["fire","random"];
+    } else if (freeze === newTheme){
+        newTheme = ["freeze","random"];
+    } else if (shock === newTheme){
+        newTheme = ["shock","random"];
+    } else if (poison === newTheme){
+        newTheme = ["poison","random"];
+    } 
 
-    console.log("This gate's theming is... ",newCombination);
-    return newCombination;
+    //console.log("This gate's theming is... ",newTheme);
+    return newTheme;
 }
-function Gate(){
-    gate.lifeTime += 1;
-    gate.maxLife = 3600;
-    if(gate.lifeTime > gate.maxLife){
-        gate.lifeTime = 0;
-        var newTheme = GetTheme();
-        gate.theme = newTheme;
-        gate.minerals["CRIMSONITE"] = 0;
-        gate.minerals["DARK MATTER"] = 0;
-        gate.minerals["LUMINITE"] = 0;
-        gate.minerals["VALESTONE"] = 0;
-        gate.minerals["MOONSTONE"] = 0;
-        gate.depthscale = {};
-        
-        dungeon.depth = {};
-        for(var j = 0; j < maxDepth; j++){
-            gate.depthscale[j] = 1 + (j / 2);
-        }
-        for(var i = 0; i < maxDepth; i++){
-            dungeon.depth[i] = {};
-        }    
-        enemies.depth = {};
-        for (var key in dungeon.depth){        
-            var chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
-            if(!dungeons[chosenArea].theme.includes("any")){
-                console.log(chosenArea);
-                while(!dungeons[chosenArea].theme.includes(newTheme[0])){
-                  console.log(chosenArea);
-                    chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
-                }
-            }
-            
-            dungeon.depth[key] = GenerateDungeon(chosenArea);
-            
-            enemies.depth[key] = {};
-            enemies.depth[key].location = {};
-           
-            for (var i = 0; i < dungeon.depth[key].currentrooms.length; i++){ 
-                enemies.depth[key].location[i] = {};   
-                if(rooms[dungeon.depth[key].currentrooms[i]].monster != null){
-                    enemies.depth[key].location[i].enemy = {};
-                } else if(rooms[dungeon.depth[key].currentrooms[i]].scenario != null){
-                    enemies.depth[key].location[i].enemy = {};     
-                }
-                
-                enemies.depth[key].location[i].enemy.health = 0;
-            }
-           
-        }
-        
-        
-        for (var key in gate.minerals){
-            gate.minerals[key] = 0;
-        }
-        
-        for(var key in userData) {
-            userData[key].enemy = null;
-            userData[key].health = userData[key].maxHealth;
-            userData[key].location = 0;
-            userData[key].downTime = 0;
-            userData[key].depth = 0;
-        }
-        
-        
-        var channel = bot.channels.get("569295829987360768");
-        var levels = [];
-        for (var key in dungeon.depth){
-            levels.push("Depth " + key + ", " + dungeon.depth[key].name);
-            
-        }
-        
-      //  //console.log(dungeon.depth);
-        const embed = new Discord.RichEmbed()
-        .setTitle("Gate Creation")
-        .addField('A new dungeon has been generated, it has levels', levels)
-        .setThumbnail("https://i.imgur.com/KTD2rHD.png")
-        .setColor(0xFCF200)
-        channel.send(embed);
-    }
-}
-function CheckGate(player){
-    Log(userData[player].name + " is checking the gate.");
-    var players = [];
-    var yourEnemy = enemies.depth[userData[player].depth].location[userData[player].location].enemy;
-    for(var key in userData){
-        if(userData[key].location === userData[player].location && userData[key].name != userData[player].name && userData[key].depth === userData[player].depth){
-            players.push(userData[key].name)
-        }
-    }
-    if(players.length === 0){
-        players.push("nobody");
-    }
-
-    var levels = [];
-        for (var key in dungeon.depth){
-            levels.push("Depth " + key + ", " + dungeon.depth[key].name);    
-        }
-    var minerals = [];
-        for (var key in gate.minerals){
-            minerals.push(key  + ": " + gate.minerals[key]);
-        }
-
-    const embed = new Discord.RichEmbed()
-        embed.setTitle("Gate")
-        embed.addField("The current dungeon is " + dungeon.depth[userData[player].depth].name, "You have reached room " + (userData[player].location + 1) + " out of " + dungeon.depth[userData[player].depth].currentrooms.length + " of this dungeon.")
-        if(yourEnemy != null){
-            embed.addField("You are currently facing off against " + yourEnemy.name , "It has " + yourEnemy.health + " health remaining.")
-        }
-        embed.addField("You are at depth: " + userData[player].depth + " of the current gate", "You have quite a ways to go.")
-        embed.addField("There is " + Math.floor((gate.maxLife - gate.lifeTime)/60) + " minutes remaining before the next gate", "You are with " + players)
-        if(minerals.length <= 0){
-            minerals.push("None, be the first to input minerals!");
-        } 
-        embed.addField("Deposited minerals", minerals)
-        embed.addField("Gate map",levels);
-        embed.setThumbnail("https://i.imgur.com/KTD2rHD.png")
-    PartyAction(embed,player);
-}
-function Check(object,player){
-    //The information we are grabbing.
-    //console.log(object)
-    if(userData[player].location <= 0){
-       const failure = new Discord.RichEmbed()
-        failure.setTitle("No checking allowed at this location, please move forward.")
-        PartyAction(failure,player);
-        return;
-        
-    }
-    var check = null;
-    for(var key in userData){
-        if(userData[key].name.toUpperCase() === object.toUpperCase()){
-            check = key;
-        }
-    }
-    for(var key in userData[player].items){
-        if(userData[player].items[key].name.toUpperCase() === object.toUpperCase()){
-            check = userData[player].items[key].name;
-        }
-    }
-    if(enemies.depth[userData[player].depth].location[userData[player].location].enemy != null){
-        if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.name != null){
-            if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.name.toUpperCase() === object.toUpperCase()){
-                check = enemies.depth[userData[player].depth].location[userData[player].location].enemy;
-            }
-        } 
-    }
-    
-    if(check === null){
-        const failure = new Discord.RichEmbed()
-        failure.setTitle("There is nothing with this name to be checked.  Check for capitals and spelling errors. If it's an item, maybe you don't have it.  Or the enemy your are trying to check is already dead.")
-        PartyAction(failure,player);
-        return;
-    }
-    const embed = new Discord.RichEmbed()
-    embed.setTitle(userData[player].name + "'s Check")
-    
-    if(check === enemies.depth[userData[player].depth].location[userData[player].location].enemy){
-            embed.addField("You are checking " + check.name, "Interesting.")  
-        if(check.name === "Basil"){
-            embed.addField(check.name + " has these recipes in stock.", check.stock)
-        } else {
-            embed.addField(check.name + " can be attacked.",check.name + " has " + check.health + " health remaining.")
-            embed.addField(check.name + " can retaliate.", check.name + " has " + check.damage + " attack power.")
-            embed.addField(check.name + " is weak to " + check.weakness + " damage.", check.name + " resists " + check.resistance + " damage.")
-        }
-    } else if(userData[check]){
-        embed.addField("You are checking " + userData[check].name , "Interesting.")
-        embed.addField(userData[check].name + " can be attacked.",userData[check].name + " has " + userData[check].health + " health remaining.")
-        embed.addField(userData[check].name + " can retaliate.", userData[check].name + " is wielding " + userData[check].equipped + ", it has " + items[userData[check].equipped].damage + " attack power.")
-    } else if (items[check]){
-        embed.addField("You are checking " + check, "Interesting.")
-        if(items[check].type === "Sword" || items[check].type === "Gun"){
-            embed.addField(check + " has " + items[check].damage + " attack power.", "It does " + items[check].damageType + " damage.")
-        }
-        embed.addField(check + " is a " + items[check].type,items[check].description)
-    }
-    PartyAction(embed,player);
-}
-function UseItem(object,player){
-    userData[player].items[object].amount -= 1;
-    const embed = new Discord.RichEmbed()
-    embed.setTitle(userData[player].name +  " is using an item!")
-    embed.addField(items[object].name, userData[player].name + " " + items[object].usage)
-    //embed.setThumbnail(items[object].art)
-
-    //Different actions here depending on the name and type of said item.
-    if(items[object].name === "Spark of Life"){
-        userData[player].downTime = 0;
-        userData[player].health = userData[player].maxHealth;
-    } else if(items[object].name === "Health Capsule"){
-        userData[player].health += 10;
-    } else if (items[object].name === "Tier 2 Warp Ticket"){
-        userData[player].location = 0;
-        userData[player].depth = 9;
-    } else if (items[object].name === "Tier 3 Warp Ticket"){
-        userData[player].location = 0;
-        userData[player].depth = 19;
-    }
-    //Vials should be thrown at enemies and do status and damage.
-    //Barriers should do damage per turn.
-    //Health Capsules should heal.
-    //Remedies should cure statuses.
-    //Recipes should add a recipe to your learned recipes.
-    PartyAction(embed,player);
-}
-function Buy(target,player){
-  
-    if(userData[player].crowns >= items[target].crowns){
-        userData[player].crowns -= items[target].crowns;
-        AddItem(target,player);
-        const embed = new Discord.RichEmbed()
-        embed.setTitle(userData[player].name + "'s Purchase")
-        embed.addField("You've successfully purchased for " + items[target].crowns + " crowns...",target)
-        Log(userData[player].name + " has purchased " + items[target].name);
-        PartyAction(embed,player);
-    } else {
-        const embed = new Discord.RichEmbed()
-        embed.setTitle(userData[player].name + "'s Purchase failed")
-        embed.addField("You don't have enough money to buy that", "Sorry")
-        PartyAction(embed,player);
-    }  
-}
+//Generate a depth.
 function GenerateDungeon(area){
-    ////console.log("Generating Dungeon..." + area);
+    //////console.log("Generating Dungeon..." + area);
     var finalArea = {};
-   
-    var finalArea = dungeons[area];
+    finalArea.rooms = dungeons[area].rooms;
+    finalArea.name = dungeons[area].name;
+    finalArea.max = dungeons[area].max;
+    finalArea.min = dungeons[area].min;
     
- 
     var maxRooms = 12;
     var minRooms = 4;
+   
+    
+    if(finalArea.max){
+        maxRooms = finalArea.max;
+    }
+    if(finalArea.min){
+        minRooms = finalArea.min;
+    }
+  
     var roomSize = Math.floor(Math.random() * maxRooms);
     if(roomSize <= minRooms){
         roomSize = minRooms;
     }
-    //console.log(roomSize + " Rooms will be in this dungeon");
+    ////console.log(roomSize + " Rooms will be in this dungeon");
     if(dungeons[area].rooms.length > 0){
+        finalArea.currentrooms = null;
         finalArea.currentrooms = [];
         for(var i = 0; i < roomSize; i++){
             var randIndex = Math.floor(Math.random() * dungeons[area].rooms.length);
             finalArea.currentrooms.push(dungeons[area].rooms[randIndex]);                                                        
         }  
-    }
-   // //console.log(finalArea);
-   console.log(area + " " + finalArea.currentrooms);
+    } else {finalArea.currentrooms = dungeons[area].currentrooms;}
+  
+    //console.log(area + " " + finalArea.currentrooms);
     return finalArea; 
 }
-function AttackChance(total){
+//#endregion
+//Check if an array contains something.
+function ExamineConditional(state,condition){
+    return (state.includes(condition));
+}
+//Check if the JSON file doesn't have any problems before writing to it.
+function isValidString(json){
+  try {
+    //Stringify the json and then attempt to Parse it.  If the parse fails we won't save the data and should neglect all changes made.
+        var check = JSON.stringify(json);
+        JSON.parse(check);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+//Save .data
+function SaveData(){  
+  if(isValidString(admin)){
+    fs.writeFile('.data/admin.json', JSON.stringify(admin,null,4), (err) =>{
+            if (err) console.error(err);
+        })
+  }
+  if(isValidString(enemies)){
+    fs.writeFile('.data/enemyInstances.json', JSON.stringify(enemies,null,4), (err) =>{
+            if (err) console.error(err);
+        })    
+  }
+  if(isValidString(dungeon)){
+    fs.writeFile('.data/dungeonInstances.json', JSON.stringify(dungeon,null,4), (err) =>{
+            if (err) console.error(err);
+      })   
+  }
+  if(isValidString(gate)){
+     fs.writeFile('.data/gates.json', JSON.stringify(gate,null,4), (err) =>{
+            if (err) console.error(err);
+      }) 
+  }
+  if(isValidString(auctions)){
+    fs.writeFile('.data/auctionHouse.json', JSON.stringify(auctions,null,4), (err) =>{
+            if (err) console.error(err);
+      })
+  }
+  if(isValidString(party)){
+    fs.writeFile('.data/instance.json', JSON.stringify(party,null,4), (err) =>{
+            if (err) console.error(err);
+      })
+  }
+  if(isValidString(user)){
+    fs.writeFile('.data/user.json', JSON.stringify(user,null,4), (err) =>{
+            if (err) console.error(err);
+        })   
+    }     
+}
+function AttackChance(probability){
     var rand = Math.floor(Math.random() * 100);
     if(rand <= 0){
         rand = 1;
     }
-   
-    if(rand <= total){
+    if(rand <= probability){
         return true;
     } else {
         return false;
     }
 }
+const arrSum = arr => arr.reduce((a,b) => a + b, 0)
 function CreateLoot(loot, weights){
     var top = 0;
     var total = 0;
-    for(var j = 0; j < weights.length; j++){
-        total+=weights[j];
-    }
+
+    total = arrSum(weights);
+
     var rand = Math.floor(Math.random() * total);
     for(var i = 0; i < loot.length; i++){
         top+=weights[i]; 
@@ -510,450 +467,726 @@ function CreateLoot(loot, weights){
         }                 
     }   
 }
-function AddItem(item, player){ 
-    if(items[item]){
-        if(!userData[player].items[items[item].name]){
-            userData[player].items[items[item].name] = {};
-        }
-        userData[player].items[items[item].name].name = items[item].name;
-        if(userData[player].items[items[item].name].amount != null){
-            userData[player].items[items[item].name].amount = userData[player].items[items[item].name].amount + 1; 
-        } else {
-            userData[player].items[items[item].name].amount = 1;
-        }       
-        Log(userData[player].name + " has obtained " + item); 
-    } 
+function DamageScale(weapon,enemy){
+    var scaled = 1;
+    var base = weapon.damage;
+    //console.log(base + " Base Damage");
+    if(enemy.weakness === weapon.damageType){
+        scaled = Math.round(base * 1.5);
+    } else if (enemy.resistance === weapon.damageType){
+        scaled = Math.round(base * 0.5);
+    } else {
+        scaled = Math.round(base);
+    }
+    //console.log(scaled + " Scaled Damage")
+    return scaled;
 }
-function Forward(player){
-    Log(userData[player].name + " is attempting to move forward!");
-    if(userData[player].downTime > 0){
-        const embed = new Discord.RichEmbed()
-        .setTitle(userData[player].name + " You're dead.")
-        PartyAction(embed,player);
+function Heat(player,embed){
+    var results = {};
+    for(var key in user){
+        var myWeapon = user[key].equipment[user[key].equipped];
+        var leveling = [];
+        if(user[key].party === user[player].party && user[key].location === user[player].location && user[key].depth === user[player].depth){
+            if(myWeapon.heat >= myWeapon.maxHeat && myWeapon.level != myWeapon.maxLevel){
+                myWeapon.level += 1;
+                myWeapon.heat -= myWeapon.maxHeat;
+                myWeapon.damage = (myWeapon.base * heat[myWeapon.level]);
+            
+                leveling.push(user[key].name + ", your weapon has leveled up to level " + myWeapon.level + "!");
+
+                if(myWeapon.level > myWeapon.maxLevel){ myWeapon.level = myWeapon.maxLevel; }
+
+                user[key].equipment[user[key].equipped] = myWeapon;
+               
+            }
+            if(leveling.length > 0){
+             embed.addField("Heating",leveling)
+            }
+           
+        }
+    }
+    results.embed = embed;
+    return results; 
+}
+function Check(object,player){
+    //The information we are grabbing.
+    Log(user[player].name + " is attempting to check something!")
+    if(user[player].location <= 0){
+       const failure = new Discord.RichEmbed()
+        failure.setTitle("No checking allowed at this location, please move forward.")
+        PartyAction(failure,player);
+        return;
+        
+    }
+    var check = null;
+    for(var key in user){
+        if(user[key].name.toUpperCase() === object.toUpperCase()){
+            check = key;
+        }
+    }
+    for(var key in user[player].items){
+        if(user[player].items[key].name.toUpperCase() === object.toUpperCase()){
+            check = user[player].items[key].name;
+        }
+    }
+    if(monsters[object.toUpperCase()] || scenarios[object]){
+        check = party[user[player].party].enemies[user[player].opponent];
+    }
+    if(check === null){
+        const failure = new Discord.RichEmbed()
+        failure.setTitle("There is nothing with this name to be checked.  Check for capitals and spelling errors. If it's an item, maybe you don't have it.  Or the enemy your are trying to check is already dead.")
+        PartyAction(failure,player);
         return;
     }
-    if(enemies.depth[userData[player].depth].location[userData[player].location].enemy != null){
-        if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.health != null){
-            if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.health > 0 && !rooms[dungeon.depth[userData[player].depth].currentrooms[userData[player].location]].scenario ){
-                const embed = new Discord.RichEmbed()
-                .setTitle(userData[player].name + " you must clear this area first ")
-                PartyAction(embed,player);
-                return; 
-            }
-        }
-    }
-    /*for(var key in enemies.depth.location){
-        if(enemies.depth[userData[player].depth].location[key].enemy === null){
-            enemies.depth[userData[player].depth].location[key].enemy = {};
-        }
-    }*/
-
-
-    userData[player].location  += 1;
-
-    if(dungeon.depth[userData[player].depth].currentrooms.length <= userData[player].location){
-        const embed = new Discord.RichEmbed()
-        .setTitle(userData[player].name + " is moving forward! ")
-        .addField(userData[player].name + " has reached the end of this dungeon inside of room " + (userData[player].location) + "!", "You'll have to descend to move any further.")
-        .setFooter(userData[player].name)
-        PartyAction(embed,player);
-        userData[player].location = dungeon.depth[userData[player].depth].currentrooms.length - 1;
-        return;
-    }
-    
-    var newMob;
-    if(rooms[dungeon.depth[userData[player].depth].currentrooms[userData[player].location]].monster){
-        newMob = rooms[dungeon.depth[userData[player].depth].currentrooms[userData[player].location]].monster;
-    } else {
-        newMob = rooms[dungeon.depth[userData[player].depth].currentrooms[userData[player].location]].scenario;
-    }
-    var myEnemy;
-    if(enemies.depth[userData[player].depth] != null){
-        if(enemies.depth[userData[player].depth].location != null){
-            if(enemies.depth[userData[player].depth].location[userData[player].location] != null){
-                if(enemies.depth[userData[player].depth].location[userData[player].location].enemy != null){
-                    Log(enemies.depth[userData[player].depth].location[userData[player].location].enemy + " enemy already exists here.");
-                    myEnemy = enemies.depth[userData[player].depth].location[userData[player].location].enemy;
-                } else {       
-                    enemies.depth[userData[player].depth].location[userData[player].location].enemy = {};
-                    myEnemy = {};
-                    myEnemy.health = 0;
-                    Log(myEnemy + " enemy created.");
-                }
-            } else {
-                enemies.depth[userData[player].depth].location[userData[player].location] = {};
-                myEnemy = {};
-                myEnemy.health = 0;
-                Log(myEnemy + " enemy created.");
-            }
-        } else {
-            enemies.depth[userData[player].depth].location = {};
-            myEnemy = {};
-            myEnemy.health = 0;
-            Log(myEnemy + " enemy created.");
-        }
-    } else {
-        enemies.depth[userData[player].depth] = {};
-        myEnemy = {};
-        myEnemy.health = 0;
-        Log(myEnemy + " enemy created.");
-    }
-    
-    if(myEnemy.health <= 0 && rooms[dungeon.depth[userData[player].depth].currentrooms[userData[player].location]].type === "battle"){
-        //console.log("New Monster " + monsters[newMob].name);
-        myEnemy = monsters[newMob];
-        if(userData[player].depth < 8){
-            myEnemy.health = Math.floor(monsters[newMob].max * userData[player].depth/4);
-            if(myEnemy.health <= 0){
-                myEnemy.health = 1;
-            }
-        } else if (userData[player].depth < 18 && userData[player].depth > 8){
-            myEnemy.health = Math.floor((monsters[newMob].max * userData[player].depth/3));
-            if(myEnemy.health <= 0){
-                myEnemy.health = 1;
-            }
-        } else {
-          myEnemy.health = Math.floor((monsters[newMob].max * userData[player].depth/2));
-            if(myEnemy.health <= 0){
-                myEnemy.health = 1;
-            }
-        }
-        myEnemy.turn = monsters[newMob].attackSpeed;
-        myEnemy.attackSpeed = monsters[newMob].attackSpeed;
-        for(var key in status){
-            if(gate.theme.includes(status[key].name)){
-                myEnemy.dealStatus = status[key].name;
-                myEnemy.statusChance = 20;
-            }
-        }   
-        enemies.depth[userData[player].depth].location[userData[player].location].enemy = myEnemy;
-    } else if (rooms[dungeon.depth[userData[player].depth].currentrooms[userData[player].location]].type === "scenario"){
-        //console.log("New Scenario");
-        myEnemy = scenarios[newMob];
-        //SCENARIO SETUP
-        if(myEnemy.name === "Basil"){
-            //console.log("It's Basil!");
-            for(var i = 0; i < myEnemy.amount; i++){
-                var newItem = CreateLoot(myEnemy.lootTable,myEnemy.lootWeights);
-                if(!myEnemy.stock.includes(newItem)){
-                    //console.log("Doesn't have this item, add it!");
-                    myEnemy.stock.push(newItem);
-                }   
-            }      
-        }
-        enemies.depth[userData[player].depth].location[userData[player].location].enemy = myEnemy;
-    } else {
-        //console.log("Enemy Exists here");
-    }
-     
-    var players = [];
-    for (var key in userData){
-        if(userData[player].location === userData[key].location && userData[player].name != userData[key].name && userData[player].depth === userData[key].depth){
-            players.push(userData[key].name);
-        }
-    }
-    if(players.length === 0){
-        players.push(" nothing else...")
-    }
-    
     const embed = new Discord.RichEmbed()
-        .setTitle(userData[player].name + " is moving forward! ")
-        .addField(userData[player].name + " has encountered " + myEnemy.name + " inside of room " + (userData[player].location) + "!", userData[player].name + " has also encountered " + players)
-        .setThumbnail(myEnemy.art)
-        .setFooter(userData[player].name)
+    embed.setTitle(user[player].name + "'s Check")
+    //console.log(check.name);
+    if(check === party[user[player].party].enemies[user[player].opponent]){
+            embed.addField("You are checking " + check.name, "...")  
+        if(check.name.toUpperCase() === "BASIL" || check.name.toUpperCase() === "GRASIL"){
+            embed.addField(check.name + " has these recipes in stock.", check.stock)
+        } else if (monsters[object.toUpperCase()]) {
+            embed.addField(check.name + " can be attacked.",check.name + " has " + check.health + " health remaining.")
+            embed.addField(check.name + " can retaliate.", check.name + " has " + check.damage + " attack power.")
+            embed.addField(check.name + " is weak to " + check.weakness + " damage.", check.name + " resists " + check.resistance + " damage.")
+        } else if (scenarios[object.toUpperCase()]){
+            embed.addField(check.check,"Interesting")
+        }
+    } else if(user[check]){
+        embed.addField("You are checking " + user[check].name , "Interesting.")
+        embed.addField(user[check].name + " can be attacked.",user[check].name + " has " + user[check].health + " health remaining.")
+        embed.addField(user[check].name + " can retaliate.", user[check].name + " is wielding " + user[check].equipped + ", it has " + user[check].equipment[user[check].equipped].damage + " attack power.")
+    } else if(user[player].equipment[check]){
+        embed.addField("You are checking " + check, "Interesting.")
+        embed.addField(check + " has " + user[player].equipment[check].damage + " attack power.", "It does " + user[player].equipment[check].damageType + " damage.")
+        embed.addField("This weapon is at level " + user[player].equipment[check].level, "It has " + user[player].equipment[check].heat + " heat and needs " + user[player].equipment[check].maxHeat + " heat for the next level." )
+        embed.addField(check + " is a " + user[player].equipment[check].type, user[player].equipment[check].description)
+        embed.addField("Moveset", user[player].equipment[check].basic + " " + user[player].equipment[check].support + " " + user[player].equipment[check].charge)
+    } else if (items[check]){
+        embed.addField("You are checking " + check, "Interesting.")
+        //embed.setThumbnail(items[check].art)
+        if(items[check].type === "Sword" || items[check].type === "Gun"){
+            embed.addField(check + " has " + items[check].damage + " attack power.", "It does " + items[check].damageType + " damage.")       
+        }
+        embed.addField(check + " is a " + items[check].type,items[check].description)
+    }
     PartyAction(embed,player);
 }
-function Descend(player){
-    Log(userData[player].name + " is attempting to descend!");
-    if(userData[player].downTime > 0){
-        const embed = new Discord.RichEmbed()
-        .setTitle(userData[player].name + " You're dead.")
-        PartyAction(embed,player);
-        return;
-    }
-    if(dungeon.depth[userData[player].depth].currentrooms.length - 1 <= userData[player].location){
-        userData[player].location = 0;
-        userData[player].depth += 1;
-        var otherPlayers = [];
-        for (var key in userData){
-            if(userData[player].location === userData[key].location && userData[player].name != userData[key].name && userData[player].depth === userData[key].depth){
-                otherPlayers.push(userData[key].name);
-            }
-        }
-        if(otherPlayers.length === 0){
-            otherPlayers.push(" nothing else...")
-        }   
-        const embed = new Discord.RichEmbed()
-        .setTitle(userData[player].name + " is descending to depth " + userData[player].depth + "...")
-        .addField(userData[player].name + " has reached " + dungeon.depth[userData[player].depth].name + " and is inside of room " + (userData[player].location + 1) + " of the dungeon!", userData[player].name + " has also encountered " + otherPlayers)
-        .setThumbnail(dungeon.depth[userData[player].depth].art)
-        .setFooter(userData[player].name)
-        PartyAction(embed,player);
-    } else {
-        const embed = new Discord.RichEmbed()
-        .setTitle(userData[player].name + " is descending... ")
-        .addField(userData[player].name + " you cannot descend right now, reach the end of the dungeon.")
-        PartyAction(embed,player);
-    }
+function SpawnEnemy(room,player){
+  var newEnemy = monsters[room.spawn];
+  newEnemy.health = ScaleHealth(monsters[room.spawn],player);
+  newEnemy.turn = newEnemy.attackSpeed;
+  
+  user[player].opponent = newEnemy.name;
+  party[user[player].party].enemies[user[player].opponent] = newEnemy;
+  
 }
-function Fight(target, player,defend){
-    Log(userData[player].name + " is attempting to fight " + target);
-    if(userData[player].downTime > 0){
-        const embed = new Discord.RichEmbed()
-        .setTitle(userData[player].name + " You're dead.")
-        PartyAction(embed,player);
+function SpawnScenario(room,player){
+  var newScenario = scenarios[room.effect];
+  
+  user[player].opponent = newScenario.name;
+  party[user[player].party].enemies[user[player].opponent] = newScenario;
+  
+  
+}
+function Interact(room,player){
+    const interaction = new Discord.RichEmbed();
+    if(room === null){
+        interaction.setTitle("Nothing to interact with here")
+        PartyAction(interaction,player);
         return;
     }
-    userData[player].cooldown -= 1;
-    var myName = userData[player].name;
-    var defense = 0;
-    var myEnemy = enemies.depth[userData[player].depth].location[userData[player].location].enemy;
-    if(myEnemy != null){
-        if(myEnemy.health <= 0){
-            const embed = new Discord.RichEmbed()
-            .setTitle(userData[player].name + " Enemy is already dead.")
-            PartyAction(embed,player);
+    if(!room.interaction){
+        interaction.setTitle("Nothing to interact with here")
+        PartyAction(interaction,player);
+        return;
+    }
+    interaction.setTitle(user[player].name + "'s Interaction")
+    interaction.addField(room.interaction,"What's going to happen?!.")
+    if(room.requirement){
+        var test = [];
+        for(var i = 0; i < room.requirement; i++){
+            if(user[player].items[room.requirement[i]] != null){
+                if(user[player].items[room.requirement[i]].amount > 0){
+                    test.push("True");
+                } else {
+                    test.push("False");
+                }
+            } else {
+                test.push("False");  
+            }    
+        }
+        if(test.includes("False")){
+            interaction.addField("You don't meet the requirements","TOO BAD")
+            PartyAction(interaction,player);
             return;
         }
     }
-    var weapon = items[userData[player].equipped]; 
-    let damage = items[userData[player].equipped].damage; 
-    var canAttack = true;
-    const embed = new Discord.RichEmbed()
-    if(userData[player].status != null){
-        userData[player].status.duration -= 1;
-        switch(userData[player].status.name){
+    if(room.spawn != null){
+        if(room.activated != null){
+            if(room.activated === true){
+                interaction.addField("You have already interacted with this scenario","Press onward.")
+                PartyAction(interaction,player);
+                return;
+            }
+        }
+        interaction.addField(room.spawn + " has appeared!", "Oh no!")
+        SpawnEnemy(room,player);
+        if(room.activated != null){
+            room.activated = true;
+        }
+    }
+    if(room.effect != null){
+        if(room.activated != null){
+            if(room.activated === true){
+                interaction.addField("You have already interacted with this scenario","Press onward.")
+                PartyAction(interaction,player);
+                return;
+            }
+        }
+        if(room.effect === "Golden Slime Wheel" && user[player].crowns >= 200){
+            user[player].crowns -= 200;
+            interaction.addField(user[player].name + "'s Wallet","You have " + user[player].crowns + " crowns left.")
+        } else if (room.effect === "Golden Slime Wheel" && user[player].crowns <= 200) {
+            interaction.addField("You need more money to spin this wheel.","Rip")  
+            PartyAction(interaction,player);
+            return;
+        }
+        var effect = CreateLoot(table[room.effect].loot,table[room.effect].weights);
+        if(monsters[effect]){
+            SpawnEnemy(room,player);
+            interaction.addField(monsters[effect].name + " has suddenly appeared!", "How will we get out of this situation?")
+        }
+        if(items[effect]){
+            AddItem(effect,player);
+            interaction.addField(user[player].name + " was rewarded with " + effect, "Congratulations!")
+        }
+        if(scenarios[effect]){
+            SpawnScenario(room,player);
+            interaction.addField(user[player].name + " something mysterious has happened...","Interesting...")
+        }
+        if(room.activated != null){
+            room.activated = true;
+        }
+        
+    }
+    PartyAction(interaction,player);
+}
+function EnemyLoot(enemy,player,embed){
+    var results = {};
+    for(var key in user){
+        if(user[key].party === user[player].party && user[key].location === user[player].location && user[key].depth === user[player].depth){
+            var rewards = [];
+            var drop = CreateLoot(table[enemy.lootTable].loot,table[enemy.lootTable].weights);
+            AddItem(drop,key);
+            
+            var crowns = CreateLoot(crownLoot,crownWeights);
+            crowns = Math.floor(crowns * gate.depthscale[user[player].depth]);
+            user[key].crowns += crowns;
+
+            var statusRewards = null;
+            var rollStatus = AttackChance(20);
+            if(
+                rollStatus && gate.theme.includes("fire") || 
+                rollStatus && gate.theme.includes("freeze") ||
+                rollStatus && gate.theme.includes("shock")||
+                rollStatus && gate.theme.includes("poison") ){
+                    statusRewards = CreateLoot(table[gate.theme[0]].loot,table[gate.theme[0]].weights)
+                    rewards.push(statusRewards);
+                    AddItem(statusRewards,player);  
+            }
+
+            rewards.push(drop);
+            rewards.push(crowns +  " Crowns");
+            embed.addField(user[key].name + "'s Rewards",rewards)
+        }
+    }
+    results.embed = embed;
+    return results;
+}
+function TakeDamage(source,target,embed){
+    var results = {};
+    target.health -= source;
+    embed.addField(target.name + " has taken "  + source + " damage! ", target.health + " health remaining. ")
+    if(target.health <= 0){ 
+        embed.addField(target.name + " has fainted ", "...")
+    }
+    results.embed = embed;
+    results.target = target;
+    results.source = source;
+    return results;
+}
+function Status(embed,victim,damage){
+    var result = {};
+    result.canAttack = true;
+    if(victim.status != null){
+        victim.status.duration -= 1;
+        switch(victim.status.name){
             //Damage over time
             case 'fire':
-                userData[player].health -= userData[player].status.damage;
-                embed.addField(userData[player].name + " is on fire! ",  "Took " + userData[player].status.damage + " damage from fire! " + userData[player].health + " health remaining." )
+                victim.health -= victim.status.damage;
+                embed.addField(victim.name + " is on fire! ",  "Took " + victim.status.damage + " damage from fire! " + victim.health + " health remaining." )
+                result.canAttack = true;
             break;
             //Can't move forward
             case 'freeze':
             break;
             //Less Damage can't heal
             case 'poison':
-                damage *= userData[player].status.damage;
-                embed.addField(userData[player].name + " isn't feeling so good! ",  userData[player].name + " is doing less damage.")
+                damage *= victim.status.damage;
+                embed.addField(victim.name + " isn't feeling so good! ", victim.name + " is doing less damage.")
+                result.canAttack = true;
             break;
             //Randomly doesn't attack
             case 'shock':
-                userData[player].health -= userData[player].status.damage;
-                embed.addField(userData[player].name + " spasmed out! ", " and took " + userData[player].status.damage + " damage from shock!")
-                canAttack = false;
+                victim.health -= victim.status.damage;
+                embed.addField(victim.name + " spasmed out! ", " and took " + victim.status.damage + " damage from shock!")
+                embed.addField(victim.health + " health remaining!","Oh boy")
+                result.canAttack = false;
             break;
             //Higher chance to miss
             case 'stun':
+                victim.turn += victim.status.damage;
+                embed.addField(victim.name + " lost a turn!","Oh boy")
             break;
             //Take damage when you attack
             case 'curse':
-                if(!defend){
-                    userData[player].health -= userData[player].status.damage;
-                    embed.addField(userData[player].name + " is cursed! ", " and took " + userData[player].status.damage + " damage from curse!")
-                }    
+                victim.health -= victim.damage;
+                embed.addField(victim.name + " is cursed! ", " and hurt themselves for " + victim.damage + " damage!")
+                embed.addField(victim.health + " health remaining!","Oh boy")
+                result.canAttack = true;
             break;
             //Disable all commands
             case 'sleep':
-                embed.addField(userData[player].name + " is really tired... ",  userData[player].name + " is asleep!")
-                canAttack = false;
+                embed.addField(victim.name + " is really tired... ",  victim.name + " is asleep!")
+                result.canAttack = false;
             break;
         }
-        if(userData[player].status.duration <= 0){
-            embed.addField(userData[player].status.name + " has worn off", userData[player].name + " is no longer affected by it!")
-            userData[player].status = null;
+        if(victim.status.duration <= 0){
+            embed.addField(victim.status.name + " has worn off", victim.name + " is no longer affected by it!")
+            victim.status = null;
         }
     }
- 
-    //Unique Enemy AI
-    if(myEnemy.name === "Devilite" || myEnemy.name === "Overtimer"){
-        myEnemy.turn -= Math.floor(Math.random() * 4);
-    } else {
-        myEnemy.turn -= 1;
+    result.damage = damage;
+    result.embed = embed;
+    result.health = victim.health;
+    result.victim = victim;
+    return result;
+}
+function Trinket(player,damage){
+    var trinket = user[player].trinket;
+    switch(trinket.type){
+        case"Buff":
+            damage = Math.round(damage * trinket.damageBoost);
+        break;
+        case"Charge":
+            user[player].cooldown -= trinket.damageBoost;
+        break;
+        case"Speed":
+            //Effect Unsure
+        break;
     }
-    if(defend === false){
-        //console.log("Fighting!")
-        if(canAttack){
-            defense = 0;
-            if(myEnemy.weakness === items[userData[player].equipped].damageType){
-                damage = Math.floor(damage * 1.5);
-            } else if (myEnemy.resistance === items[userData[player].equipped].damageType){
-                damage = Math.floor(damage * 0.5);
+}
+function GetMove(weapon, move){
+    switch(move){
+        case "basic":
+            return weapon.basic;
+        case "support":
+            return weapon.support;
+        case "charge":
+            return weapon.charge;
+    }
+}
+function Fight(player, move = "basic"){
+    Log(user[player].name + " is fighting!")
+    //Referencing Enemy and our Weapon
+    var embed = new Discord.RichEmbed();
+    var enemy = party[user[player].party].enemies[user[player].opponent];
+    ////console.log(enemy);
+    var weapon = user[player].equipment[user[player].equipped];
+    var damage = weapon.damage;
+   
+    if(weapon.damage <= 0){
+        weapon.damage = 1;
+    }
+    if(user[player].health === null){
+        if(user[player].maxHealth === null){
+            user[player].maxHealth = 20;
+        }
+        user[player].health = user[player].maxHealth;
+    }
+    if(enemy === null){
+        embed.setTitle("No enemy here to attack.")
+        PartyAction(embed,player);
+        return;
+    } else if(enemy.health <= 0){
+        embed.setTitle("No enemy here to attack.")
+        PartyAction(embed,player);
+        return;
+    }
+    if(user[player].downTime){
+        embed.setTitle("You are dead, consider restarting the run?")
+        PartyAction(embed,player);
+        return;
+    }
+    var canAttack = true;
+    var enoughMist = true;
+    if(user[player].status != null){
+        var playerStatus = Status(embed,user[player],weapon.damage);
+        embed = playerStatus.embed;
+        user[player] = playerStatus.victim;
+        damage = playerStatus.damage;
+        canAttack = playerStatus.canAttack;
+    }
+
+    enemy.canAttack = true;
+    if(enemy.status != null){
+        var enemyStatus = Status(embed,enemy,enemy.damage);
+        embed = enemyStatus.embed;
+        enemy = enemyStatus.victim;
+        enemy.health = enemyStatus.health;
+        enemy.damage = enemyStatus.damage;
+        enemy.canAttack = enemyStatus.canAttack;
+    }
+
+    var defense = 0;
+    //Player's turn
+    //Get your move.
+    var myMove = GetMove(weapon,move);
+    var dodge = 0;
+    if(user[player].mist < moves[myMove].mist){
+        enoughMist = false;
+    }    
+    
+    var properties = moves[myMove].properties;
+    //console.log(myMove);
+
+    embed.setTitle(user[player].name + " used" + moves[myMove].usage)  
+    if(enoughMist){
+        //Move Properties.
+        //This is how the game tells what each move will do.
+        //I can configure properties in the moves.json.
+        if(ExamineConditional(properties,"damage")){
+            damage = DamageScale(weapon,enemy);
+                
+            Trinket(player,damage);
+            var results = TakeDamage(damage,enemy,embed);
+            if(weapon.status){
+                if(AttackChance(weapon.chance)){
+                    embed.addField(enemy.name + " was inflicted with " + weapon.status + "!","Nice!")
+                    enemy.status = status[weapon.status];
+                    enemy.status.duration = 3;
+                }
             }
+            enemy = results.target;
+            embed = results.embed;  
+        }
+        if(ExamineConditional(properties,"multihit")){
+            damage = DamageScale(weapon,enemy);
             if(weapon.multihit){
                 for(var i = 0; i < weapon.multihit; i++){
-                    if(AttackChance(weapon.chance)){
-                        embed.addField("You hit again!","Bam!")
-                        if(myEnemy.weakness === items[userData[player].equipped].damageType){
-                            damage += Math.floor(weapon.damage * 1.5);
-                        } else if (myEnemy.resistance === items[userData[player].equipped].damageType){
-                            damage += Math.floor(weapon.damage * 0.5);
-                        } 
-                    }         
+                    if(AttackChance(weapon.chance - (i * 2))){
+                        damage += DamageScale(weapon,enemy);
+                        embed.addField("You hit again!","Whew!")
+                    }   
+                }
+            }              
+            Trinket(player,damage);
+            var results = TakeDamage(damage,enemy,embed);
+            if(weapon.status){
+                if(AttackChance(weapon.chance)){
+                    embed.addField(enemy.name + " was inflicted with " + weapon.status + "!","Nice!")
+                    enemy.status = status[weapon.status];
+                    enemy.status.duration = 3;
                 }
             }
-            myEnemy.health -= damage;
-        } else {
-            embed.addField(userData[player].name + " can't attack! ", "Oh No!")
+            enemy = results.target;
+            embed = results.embed;  
+
         }
-        
-    } else if (defend === true){
-        defense = 2; //TODO: Shields and defense strength
-        embed.addField(userData[player].name + " is defending!", "They'll take less damage this turn!")
-        embed.addField(myEnemy.name + " has " + myEnemy.turn  + " turns until it attacks!", "Get ready!")
-    }
-   
-            //Monster Attacks
+        if(ExamineConditional(properties,"any status")){
+            var possible = ["FIRE","FREEZE","POISON","CURSE","STUN","SHOCK"];
+            var rand = Math.floor(Math.random() * possible.length);
             
-            var monster = false;
-            if(myEnemy.turn <= 0){
-                var success = AttackChance(items[userData[player].equipped].range);
-                myEnemy.turn = myEnemy.attackSpeed;
-                monster = true;
-                if(success){
-                    //Enemy hits you
-                    var finalDamage = myEnemy.damage - defense;
-                    userData[player].health -= finalDamage;
-                    if(myEnemy.statusChance != null){
-                        var statusChance = AttackChance(myEnemy.statusChance);
-                        if(statusChance){
-                            userData[player].status = {};
-                            userData[player].status = status[myEnemy.dealStatus.toString().toUpperCase()]; 
-                            userData[player].status.duration = 3;
-                            embed.addField(userData[player].name + " has caught " + myEnemy.dealStatus, "This isn't good.")
-                        }
-                    }
-                  
-                    if(finalDamage <= 0){
-                        finalDamage = 0;
-                    }
-                    embed.setTitle(myEnemy.name)
-                    embed.addField(myEnemy.name+ " unleashes an attack!", myName + " took " + finalDamage + " damage!")
-                    embed.addField(myName + " has " + userData[player].health + " health remaining!", ". . .")
-                    embed.setThumbnail(myEnemy.art)   
-                } else {
-                    //Enemy Misses attack
-                    embed.setTitle(myEnemy.name)
-                    embed.addField(myEnemy.name + " unleashes an attack!", myEnemy.name+ " missed!")
-                    embed.setThumbnail(myEnemy.art) 
-                }            
-            }
-            //You Attack   
-            if(defend === false){
-                embed.addField(myName + " attacks " +myEnemy.name + " with " + userData[player].equipped + "!",  myName + " dealt "   + damage + " damage!")
-                embed.addField(myEnemy.name + " has " + myEnemy.health + " health remaining!", myEnemy.name + " has " + myEnemy.turn  + " turns until it attacks!")
-                embed.setFooter(myName)
-            }
-            
-            if(monster === false){
-               // embed.setThumbnail(message.author.avatarURL)
-            }   
-            
-            //If Player Dies
-            if(userData[player].health <= 0){
-                userData[player].downTime = downTime;
-                //console.log("you ded");
-                embed.addField(myName + " has fainted", ". . . ")
-                embed.addField(myName + " is out of commission...", " Rest In Peace " + userData[player].name)
-                embed.addField("You can do !restart", "To go back to the begining of the gate")
-               // embed.setThumbnail(message.author.avatarURL)    
-            }
-            //If Monster Dies
-            if(myEnemy.health <= 0){
-                
-                
-                var people = [];
-                embed.addField(myEnemy.name + " fainted ", "...")
+            enemy.status = {};
+            enemy.status = status[possible[rand]];
+            enemy.status.duration = 3;
 
-                for(var key in userData){
-                    if(userData[key].location === userData[player].location && userData[key].depth === userData[player].depth){
-                        var rewards = CreateLoot(myEnemy.lootTable, myEnemy.lootWeights);
-                        var crownRewards  = CreateLoot(crowns,crownWeights);
-                        crownRewards = Math.floor(crownRewards * gate.depthscale[userData[player].depth]);
-                        people.push(userData[key].name);
-                        AddItem(rewards,player);
+            var results = TakeDamage(damage,enemy,embed);
+            enemy = results.target;
+            embed = results.embed;   
+        }
+        if(ExamineConditional(properties,"dodge")){
+            dodge = 30;
+        }
+        if(ExamineConditional(properties, "heal")){
+            user[player].health += weapon.damage;
+            if(user[player].health >= user[player].maxHealth){
+                user[player].health = user[player].maxHealth;
+            }
+            embed.addField(user[player].name + " has healed for " + weapon.damage + " points!")
+        }
+        if(ExamineConditional(properties,"cost")){
+            user[player].mist -= moves[myMove].mist;
+        }
+        if(ExamineConditional(properties,"richochet")){
 
-                        userData[key].experience += Math.floor(myEnemy.exp * gate.depthscale[userData[player].depth]);
-                        userData[key].crowns += crownRewards          
-                        
-                        embed.addField(userData[key].name + "'s Loot", crownRewards + " crowns, and " + rewards)
-                    }
-                }
-                embed.addField(people + " have gained " + myEnemy.exp + " experience points ", "Congrats")
-                target = target.toUpperCase();
-                myEnemy = null;
-                myEnemy = {};
-                myEnemy.health = 0;
-                enemies.depth[userData[player].depth].location[userData[player].location].enemy = myEnemy;
-            }
-            for(var key in userData){
-                if(userData[key].location === userData[player].location && userData[key].depth === userData[player].depth){
-                    PartyAction(embed,key);
-                }
-            }
-        
-}
-function Special(player){
-    const special = new Discord.RichEmbed()
-    special.setTitle(userData[player].name + 's Special')
-    var mySpecial = items[userData[player].equipped].special;
-    if(userData[player].cooldown <= 0){
-        if(mySpecial === "heal"){
-            userData[player].cooldown = 6;
-            userData[player].health += items[userData[player].equipped].damage;
-            special.addField(userData[player].name + " used their special move and healed for " + items[userData[player].equipped].damage + " points!","Whoa!")
-        } else if (mySpecial === "damage"){
-            userData[player].cooldown = 6;
-            if(enemies.depth[userData[player].depth].location[userData[player].location].enemy != null && userData[player].location > 0){  
-                if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.health > 0){
-                    var myEnemy = enemies.depth[userData[player].depth].location[userData[player].location].enemy;
-                    myEnemy.health -= (items[userData[player].equipped].damage * 2);
-                    special.addField(userData[player].name + " used their special move and dealt " + items[userData[player].equipped].damage * 2 + " points of damage!","Whoa!")
-                    if(myEnemy.health <= 0){
-                        var people = [];
-                        special.addField(myEnemy.name + " fainted ", "...")
-                        for(var key in userData){
-                            if(userData[key].location === userData[player].location && userData[key].depth === userData[player].depth){
-                                var rewards = CreateLoot(myEnemy.lootTable, myEnemy.lootWeights);
-                                var crownRewards  = CreateLoot(crowns,crownWeights);
-                                crownRewards = Math.floor(crownRewards * gate.depthscale[userData[player].depth]);
-                                people.push(userData[key].name);
-                                AddItem(rewards,player);
-        
-                                userData[key].experience += Math.floor(myEnemy.exp * gate.depthscale[userData[player].depth]);
-                                userData[key].crowns += crownRewards          
-                                
-                                special.addField(userData[key].name + "'s Loot", crownRewards + " crowns, and " + rewards)
-                            }
-                        }
-                        special.addField(people + " have gained " + myEnemy.exp + " experience points ", "Congrats")
-                        myEnemy = null;
-                        myEnemy = {};
-                        myEnemy.health = 0;
-                        enemies.depth[userData[player].depth].location[userData[player].location].enemy = myEnemy;
-                    }
-                    for(var key in userData){
-                        if(userData[key].location === userData[player].location && userData[key].depth === userData[player].depth){
-                            PartyAction(special,key);
-                        }
-                    }
-                } else {
-                    special.addField("No enemy here to attack", "Sad.")
-                }
-            } else {
-                special.addField("No enemy here to attack", "Sad.")
-            }
-        } else {
-            special.addField(userData[player].name + " you don't have a special move.", "Sad.")
         }
     } else {
-        special.addField(userData[player].name + "'s special move isn't ready yet, you need " + userData[player].cooldown + " more battle commands.","Fight, fight, fight!")
+        embed.setTitle(user[player].name + " used" + moves[myMove].usage + " ... but it failed!");
     }
     
-    PartyAction(special,player);
+     
+       
+    //Enemy's Turn
+    embed.addField(enemy.name + " has turns " + ( enemy.turn ) + " turns until it attacks! ","Get Ready...")
+    if(enemy.turn <= 0){
+        //embed.setThumbnail(enemy.art)
+        if(enemy.canAttack){
+            if(AttackChance(weapon.range - dodge)){
+                var attack = enemy.damage - defense;
+                if(attack < 0) { attack = 0;}
+                embed.addField(enemy.name + " unleashes an attack!","...")
+                var results = TakeDamage(attack,user[player],embed);
+                user[player] = results.target;
+                embed = results.embed;
+            } else {
+                embed.addField(enemy.name + " missed! ", "Nice!")
+            }
+            enemy.turn = enemy.attackSpeed;
+        } else {
+            embed.addField(enemy.name + " couldn't attack! ","Oh boy")
+        }
+    }
+    if(enemy.health <= 0){
+        var rewards = EnemyLoot(enemy,player,embed);
+        embed = rewards.embed;
+        user[player].equipment[user[player].equipped].heat += (enemy.exp * gate.depthscale[user[player].depth]);
+        embed.addField(user[player].name + " your weapon has gained " + enemy.exp + " heat.","Level it up to get stronger!")
+        if(user[player].equipment[user[player].equipped].heat > user[player].equipment[user[player].equipped].maxHeat){
+            var heat = Heat(player,embed);
+            embed = heat.embed;
+        }
+    } else if (user[player].health <= 0){
+        user[player].downTime = true;
+        embed.addField("You are now out of commission...","Do !restart to restart the gate.")
+    }
+    enemy.turn -= 1;
+    party[user[player].party].enemies[user[player].opponent] = enemy;
+    PartyAction(embed,player);
+
+    //Displaying Stats.
+    const stats = new Discord.RichEmbed();
+    stats.setTitle(user[player].name + "'s Stats")
+    stats.addField("Health",user[player].health)
+    stats.addField("Max Health", user[player].maxHealth)
+    stats.addField("Weapon",user[player].equipped)
+    stats.addField("Mist",user[player].mist)
+    stats.addField("Max Mist",user[player].maxMist)
+    StatusAction(stats,player);
+    
+}
+function AddItem(item, player, amount = 0){ 
+    if(items[item]){
+        if(!user[player].items[items[item].name]){
+            user[player].items[items[item].name] = {};
+            user[player].items[items[item].name].amount = 0;
+        }
+        user[player].items[items[item].name].name = items[item].name;
+        if(user[player].items[items[item].name].amount != null){
+            if(amount > 0){
+                user[player].items[items[item].name].amount = user[player].items[items[item].name].amount + amount; 
+            } else {
+                user[player].items[items[item].name].amount = user[player].items[items[item].name].amount + 1; 
+            }
+        } else {
+            if(amount > 0){
+                user[player].items[items[item].name].amount = user[player].items[items[item].name].amount + amount; 
+            }  else {
+                user[player].items[items[item].name].amount = 1;
+            }
+          
+        }       
+        Log(user[player].name + " has obtained " + item); 
+    } 
+}
+function Buy(target,player){
+    Log(user[player].name + " is attempting to buy an item!")
+    if(user[player].crowns >= items[target].crowns){
+        user[player].crowns -= items[target].crowns;
+        AddItem(target,player);
+        const embed = new Discord.RichEmbed()
+        embed.setTitle(user[player].name + "'s Purchase")
+        embed.addField("You've successfully purchased for " + items[target].crowns + " crowns...",target)
+        Log(user[player].name + " has purchased " + items[target].name);
+        PartyAction(embed,player);
+    } else {
+        const embed = new Discord.RichEmbed()
+        embed.setTitle(user[player].name + "'s Purchase failed")
+        embed.addField("You don't have enough money to buy that", "Sorry")
+        PartyAction(embed,player);
+    }  
+}
+function Stock(enemy){
+    for(var i = 0; i < enemy.amount; i++){
+        var newItem = CreateLoot(enemy.buyTable,enemy.buyWeights);
+        if(!enemy.stock.includes(newItem)){
+            ////console.log("Doesn't have this item, add it!");
+            enemy.stock.push(newItem);
+        }   
+    }
+    return enemy;
+}
+function ScaleHealth(enemy,player){
+    var newHealth = enemy.max;
+    if(user[player].depth >= 0 && user[player].depth < 5){
+        //console.log("stratum1");
+        newHealth = Math.round(newHealth * table.depthscale["1"]);
+      } else if (user[player].depth >= 5 && user[player].depth < 8){
+        //console.log("stratum2");
+        newHealth = Math.round(newHealth * table.depthscale["2"]);
+      } else if (user[player].depth >= 8 && user[player].depth < 13){
+        //console.log("stratum3");
+        newHealth = Math.round(newHealth * table.depthscale["3"]);
+      } else if (user[player].depth >= 13 && user[player].depth < 18) {
+        //console.log("stratum4");
+        newHealth = Math.round(newHealth * table.depthscale["4"]);
+      } else if (user[player].depth >= 18 && user[player].depth < 23) {
+        //console.log("stratum5");
+        newHealth = Math.round(newHealth * table.depthscale["5"]);
+      } else if (user[player].depth >= 23 && user[player].depth < 28) {
+        //console.log("stratum6");
+        newHealth = Math.round(newHealth * table.depthscale["6"]);
+      } else if (user[player].depth >= 28 && user[player].depth < 33) {
+        //console.log("stratum7");
+        newHealth = Math.round(newHealth * table.depthscale["7"]);
+      } else if (user[player].depth >= 33 && user[player].depth < 38) {
+        //console.log("stratum8");
+        newHealth = Math.round(newHealth * table.depthscale["8"]);
+      }
+    return newHealth;
+}
+function Forward(player){
+    var embed = new Discord.RichEmbed()
+    if(user[player].downTime){
+        embed.setTitle("You are dead, consider restarting the run?")
+        PartyAction(embed,player);
+        return;
+    }
+    var depth = user[player].depth;
+    var location = user[player].location;
+    var enemy = party[user[player].party].enemies[user[player].opponent];
+
+    if(enemy != null){
+       if(enemy.health > 0 && !enemy.stock){
+        embed.addField("You must kill the enemy in this area first, try hitting fight.","Fight fight fight")
+        PartyAction(embed,player);
+        return;
+      }
+    }
+
+    location += 1;
+
+    if(dungeon.depth[depth].currentrooms.length <= location){
+        const embed = new Discord.RichEmbed()
+        location = dungeon.depth[depth].currentrooms.length
+        embed.setTitle(user[player].name + " is moving forward! ")
+        embed.addField(user[player].name + " has reached the end of this dungeon inside of room " + (user[player].location) + "!", "You'll have to descend to move any further.")
+        embed.setFooter(user[player].name)
+        PartyAction(embed,player);
+        user[player].location = dungeon.depth[user[player].depth].currentrooms.length - 1;
+        return;
+    }
+
+    var newMob;
+    if(rooms[dungeon.depth[depth].currentrooms[location]].monster){
+        newMob = rooms[dungeon.depth[depth].currentrooms[location]].monster;
+    } else {
+        newMob = rooms[dungeon.depth[depth].currentrooms[location]].scenario;
+    }
+
+    var newEnemy;
+    if(monsters[newMob]){
+
+        newEnemy = {};
+
+        if(!gate.enemy ) { gate.enemy = 0; }
+
+        newEnemy.id = gate.enemy;
+        gate.enemy += 1;
+        Log("New Enemy Instanced for " + user[player].name + "'s Party");
+        //console.log("Enemy ID " + newEnemy.id);
+
+        newEnemy = monsters[newMob];
+        newEnemy.health = ScaleHealth(monsters[newMob],player);
+        newEnemy.damage = monsters[newMob].damage;
+        newEnemy.turn = newEnemy.attackSpeed;
+        newEnemy.canAttack = true;
+        newEnemy.status = null;
+        newEnemy.status = {};
+
+    } else if (scenarios[newMob]){
+        newEnemy = scenarios[newMob];
+        if(newEnemy.activated){
+            newEnemy.activated = false;
+        }
+        switch(newEnemy.name){
+            case 'Basil':
+                newEnemy.stock = Stock(newEnemy).stock;
+            break;
+            case 'Grasil':
+                newEnemy.stock = Stock(newEnemy).stock;
+            break;
+        }
+    }
+
+    user[player].opponent = newEnemy.name.toUpperCase();
+    party[user[player].party].enemies[user[player].opponent] = newEnemy;
+   
+    user[player].depth = depth;
+    user[player].location = location;
+    embed.addField("You have encountered " + newEnemy.name + " inside of room " + user[player].location + "!","Get ready for a fight.")
+    //embed.setThumbnail(newEnemy.art)
+    PartyAction(embed,player);
+    Log(user[player].name + " is attempting to move forward!")
+}
+function Descend(player){
+    var embed = new Discord.RichEmbed()
+    Log(user[player].name +  " is attempting to descend!")
+    if(user[player].downTime){
+        embed.setTitle("You are dead, consider restarting the run?")
+        PartyAction(embed,player);
+        return;
+    }
+    if(user[player].depth === maxDepth && dungeon.depth[user[player].depth].currentrooms.length - 1 <= user[player].location){
+        embed.setTitle("Congratulations, you have reached the end of this gate, consider restarting the run?")
+        PartyAction(embed,player);
+        return;
+    }
+    if(dungeon.depth[user[player].depth].currentrooms.length - 1 <= user[player].location){
+        user[player].location = 0;
+        user[player].depth += 1;
+
+        var bonusPrize = CreateLoot(table.bonus.loot,table.bonus.weights);
+        AddItem(bonusPrize,player);
+        
+        const embed = new Discord.RichEmbed()
+        embed.setTitle(user[player].name + " is descending to depth " + user[player].depth + "...")
+        embed.addField(user[player].name + " has reached " + dungeon.depth[user[player].depth].name + " and is inside of room " + (user[player].location + 1) + " of the dungeon!", "Get ready for an adventure!")
+        embed.addField(user[player].name + " has earned a bonus prize of " + bonusPrize , "Congratulations!")
+        //.setThumbnail(dungeon.depth[user[player].depth].art)
+        embed.setFooter(user[player].name)
+        PartyAction(embed,player);
+    } else {
+        const embed = new Discord.RichEmbed()
+        embed.setTitle(user[player].name + " is descending... ")
+        embed.addField(user[player].name + " you cannot descend right now, reach the end of the dungeon.")
+        PartyAction(embed,player);
+    }
 }
 function Inventory(player){
-    Log(userData[player].name + " is checking their inventory.");
-    if(userData[player].partyInstance === 0){
+    Log(user[player].name + " is checking their inventory.");
+    if(user[player].partyInstance === 0){
         return;
     }  
 
@@ -965,22 +1198,25 @@ function Inventory(player){
         var recipes = [];
         var minerals = [];
         var trinkets = [];
-        for(var key in userData[player].items) {
-            if(userData[player].items[key].amount > 0){
+        var rarity = [];
+        for(var key in user[player].items) {
+            if(user[player].items[key].amount > 0){
                 if(items[key].type === "Material"){
-                    materials.push(userData[player].items[key].amount + " " + userData[player].items[key].name);
+                    materials.push(user[player].items[key].name + " " + user[player].items[key].amount);
                 } else if (items[key].type === "Sword" || items[key].type === "Gun"){
-                    weapons.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
+                    weapons.push(user[player].items[key].name + " " + user[player].items[key].amount);
                 } else if(items[key].type === "Usable"){
-                    usables.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
+                    usables.push(user[player].items[key].name + " " + user[player].items[key].amount);
                 } else if (items[key].type === "Recipe"){
-                    recipes.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
+                    recipes.push(user[player].items[key].name + " " + user[player].items[key].amount);
                 } else if (items[key].type === "Mineral"){
-                    minerals.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
+                    minerals.push(user[player].items[key].name + " " + user[player].items[key].amount);
                 } else if (items[key].type === "Trinket"){
-                    trinkets.push(userData[player].items[key].name + " " + userData[player].items[key].amount);
+                    trinkets.push(user[player].items[key].name + " " + user[player].items[key].amount);
+                } else if (items[key].type === "Rarity"){
+                    rarity.push(user[player].items[key].name + " " + user[player].items[key].amount);
                 }
-                //console.log(userData[player].items[key])
+                ////console.log(user[player].items[key])
             }  
         }
         if(materials.length === 0){
@@ -1001,115 +1237,541 @@ function Inventory(player){
         if(trinkets.length === 0){
             trinkets.push("Nothing");
         }
+        if(rarity.length === 0){
+            rarity.push("Nothing");
+        }
+
         materials.sort();
         usables.sort();
         weapons.sort();
         recipes.sort();
         minerals.sort();
         trinkets.sort();
-        inv.setTitle(userData[player].name + "'s Inventory")
-        inv.addField('Crowns', userData[player].crowns)
-        inv.addField('Weapons', weapons)  
-        inv.addFIeld('Trinkets',trinkets)
-        inv.addField('Materials', materials)  
-        inv.addField('Minerals', minerals)
-        inv.addField('Usables', usables)  
-        inv.addField('Recipes', recipes)  
-        inv.addField('Equipped Weapon', userData[player].equipped)    
-        inv.addField('Equipped Trinket', userData[player].trinket.name)
-       // inv.setThumbnail(message.author.avatarURL)
+        rarity.sort();
+
+        inv.setTitle(user[player].name + "'s Inventory")
+        inv.addField('Crowns', user[player].crowns)
+        //inv.addField('Energy', user[player].energy)
+        switch(user[player].page){
+            case 0:
+                inv.addField('Page 0 Weapons', weapons)  
+                inv.addField('Equipped Weapon', user[player].equipped) 
+            break;
+            case 1:
+                inv.addField('Page 1 Trinkets',trinkets)
+                inv.addField('Equipped Trinket', user[player].trinket.name)
+            break;
+            case 2:
+                inv.addField('Page 2 Materials', materials)  
+            break;
+            case 3:
+                inv.addField('Page 3 Minerals', minerals)
+            break;
+            case 4:
+                inv.addField('Page 4 Usables', usables) 
+            break;
+            case 5:       
+                inv.addField('Page 5 Recipes', recipes) 
+            break;
+            case 6:
+                inv.addField('Page 6 Rarities', rarity) 
+            break;
+        }
+        //inv.setThumbnail(user[player].art)
         inv.setColor(0xFCF200)
     
-    PartyAction(inv,player); 
+    StatusAction(inv,player); 
 }
-function SaveData(){
-    fs.writeFile('game/userData.json', CircularJSON.stringify(userData), (err) =>{
-        if (err) console.error(err);
-    })
-    fs.writeFile('game/enemyInstance.json', JSON.stringify(enemies), (err) =>{
-        if (err) console.error(err);
-    }) 
-    fs.writeFile('game/dungeonInstance.json', JSON.stringify(dungeon), (err) =>{
-        if (err) console.error(err);
-    })
-    fs.writeFile('game/gate.json', JSON.stringify(gate), (err) =>{
-        if (err) console.error(err);
-    })
-    fs.writeFile('game/auctions.json', JSON.stringify(auctions), (err) =>{
-        if (err) console.error(err);
-    })
+function UseItem(object,player){
+    Log(user[player].name + "is using an item!")
+    var effect = items[object].effect;
+    const embed = new Discord.RichEmbed()
+    embed.setTitle(user[player].name +  " is using an item!")
+    embed.addField(items[object].name, user[player].name + " " + items[object].usage)
+    //embed.setThumbnail(items[object].art)
+    var consumed = false;
+    //Different actions here depending on the name and type of said item.
+    if(ExamineConditional(effect,"heal")){
+        user[player].health += items[object].value;
+        consumed = true;
+    }
+    if(ExamineConditional(effect,"revive")){
+        user[player].downTime = false;
+        user[player].health += items[object].value;
+        consumed = true;
+    }
+    if(ExamineConditional(effect,"warp")){
+        user[player].location = 0;
+        user[player].depth = items[object].value;
+        consumed = true;  
+    }
+    if(ExamineConditional(effect,"lootbox")){
+        if(user[player].items["Silver Key"]){
+            if(user[player].items["Silver Key"].amount > 0){
+                var prize = CreateLoot(table[items[object].name].loot,table[items[object].name].weights);
+                AddItem(prize,player);
+                consumed = true;
+                embed.addField("Congratulations, you have unboxed a " + prize, "Enjoy!")
+                user[player].items[object].amount -= 1;
+                user[player].items["Silver Key"].amount -= 1;
+            } else {
+                embed.addField("You need a Silver Key to open this","Get Hunting!")
+            }
+        } else {
+            embed.addField("You need a Silver Key to open this","Get Hunting!")
+        }
+    }
+    if(ExamineConditional(effect,"heat")){
+        user[player].equipment[user[player].equipped].heat += items[object].value;
+        var results = Heat(player,embed);
+        embed = results.embed;
+        consumed = true;
+    }
+    if(consumed){
+        user[player].items[object].amount -= 1;
+    }
+    if(user[player].health >= user[player].maxHealth){
+        user[player].health = user[player].maxHealth;
+    }
+    
+    //Vials should be thrown at enemies and do status and damage.
+    //Barriers should do damage per turn.
+    //Health Capsules should heal.
+    //Remedies should cure statuses.
+    //Recipes should add a recipe to your learned recipes.
+    PartyAction(embed,player);
 }
-function PlayerCommands(instance,player){
-    var actions = [forwardEmoji,blockEmoji,fightEmoji,inventoryEmoji,gateEmoji,descendEmoji,specialEmoji];
+function NextPage(player, direction, set = false){
+    user[player].page += direction;
+    if(set){
+        user[player].page = direction;
+    }
+    
+    if(user[player].page > 6){
+        user[player].page = 0
+    }
+    if(user[player].page < 0){
+        user[player].page = 6
+    }
+    
+    Inventory(player);
+}
+function Equip(player,item){
+    if(user[player].equipment[item]){
+        //If you already have had this weapon before, get its data
+        user[player].equipped = items[item].name;
+
+        user[player].equipment[user[player].equipped].basic = items[item].basic;
+        user[player].equipment[user[player].equipped].support = items[item].support;
+        user[player].equipment[user[player].equipped].charge = items[item].charge;
+
+        user[player].equipment[user[player].equipped].base = items[item].damage;
+        user[player].equipment[user[player].equipped].special = items[item].special;
+        user[player].equipment[user[player].equipped].damage = items[item].damage * heat[user[player].equipment[item].level];
+    } else {
+        //If this is your first time with this weapon, create a new instance of it.
+        user[player].equipped = items[item].name; 
+        user[player].equipment[user[player].equipped] = items[item];
+        user[player].equipment[user[player].equipped].heat = 0;
+        user[player].equipment[user[player].equipped].maxHeat = 100;
+        user[player].equipment[user[player].equipped].level = 1;
+        user[player].equipment[user[player].equipped].maxLevel = 10;
+        user[player].equipment[user[player].equipped].base = items[item].damage;
+        user[player].equipment[user[player].equipped].damage = items[item].damage * heat[user[player].equipment[item].level]; 
+        Equip(player,item);
+    }
+    const embed = new Discord.RichEmbed();
+    embed.setTitle("Equipped " + items[item].name);
+    PartyAction(embed,player);
+    //console.log(user[player].equipment[user[player].equipped]);
+
+}
+//The Status Window
+function PlayerStatus(instance,player){
+    var actions = [gateEmoji,leftpageEmoji,rightpageEmoji];
     const filter = (reaction, user) => actions.includes(reaction.emoji.id) && user.id === player
     const collector = instance.createReactionCollector(filter, { max: 10000000, time: 2147483647 });
-                 collector.on('collect', r => {
-                     if(r.emoji.name === 'fight'){
-                         if(enemies.depth[userData[player].depth].location[userData[player].location].enemy != null && userData[player].location > 0){  
-                             if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.health > 0){
-                                Fight(enemies.depth[userData[player].depth].location[userData[player].location].enemy.name.toString().toUpperCase(),player,false);
-                             }  else {
-                                const embed = new Discord.RichEmbed();
-                                embed.setTitle("No enemy to attack.")
-                                PartyAction(embed,player);
-                              
-                            }  
-                         } else {
-                             const embed = new Discord.RichEmbed();
-                             embed.setTitle("No enemy to attack.")
-                             PartyAction(embed,player);
-                           
-                         }
-                     } else if (r.emoji.name === 'block'){
-                        if(enemies.depth[userData[player].depth].location[userData[player].location].enemy != null && userData[player].location > 0){    
-                            Fight(enemies.depth[userData[player].depth].location[userData[player].location].enemy.name.toString().toUpperCase(),player,true);
-                         } else {
-                             const embed = new Discord.RichEmbed();
-                             embed.setTitle("No enemy to defend against.")
-                             PartyAction(embed,player);
-                           
-                         }
-                     } else if (r.emoji.name === 'forward'){
-                        Forward(player);
-                   
-                     } else if (r.emoji.name === 'inventory'){
-                        Inventory(player);
-                   
-                     } else if (r.emoji.name === 'descend'){
-                        Descend(player);
-                       
-                     } else if (r.emoji.name === 'gate'){
+                collector.on('collect', r => {
+                    //If maintenance mode is turned on, don't let users interact.
+                if(admin.maintenance && !user[player].admin)   {
+                    //console.log(user[player].name + " is not an Admin.")
+                     return;
+                }
+                switch(r.emoji.name){
+                    case 'gate':
                         CheckGate(player);
-                        
-                     } else if (r.emoji.name === 'special'){
-                        Special(player);
-                     }
-                    
+                    break;    
+                    case 'leftpage':
+                        NextPage(player,-1);
+                    break;
+                    case 'rightpage':
+                        NextPage(player,1);
+                    break;    
+                }             
+        }); 
+        //Restart the reaction collector if it ends.
+        collector.on('end',r =>{
+            Log(user[player].name + "'s collector ended, booting up a new one.")
+            PlayerStatus(instance,player);
         });
 }
-function PartyAction(action, player){
-    var channel = bot.channels.get(userData[player].partyChannel); 
-    if(userData[player].partyInstance != 0){
-        channel.fetchMessage(userData[player].partyInstance).then (sentEmbed =>{         
-                 sentEmbed.edit(action);                  
+//Player Instance
+function PlayerCommands(instance,player){
+    var actions = [forwardEmoji,fightEmoji,descendEmoji,checkEmoji,interactEmoji,supportEmoji,chargeEmoji];
+    const filter = (reaction, user) => actions.includes(reaction.emoji.id) && user.id === player
+    const collector = instance.createReactionCollector(filter, { max: 10000000, time: 2147483647 });
+                collector.on('collect', r => {
+                    //If maintenance mode is turned on, don't let users interact.
+                if(admin.maintenance && !user[player].admin)   {
+                    //console.log(user[player].name + " is not an Admin.")
+                     return;
+                }
+                switch(r.emoji.name){
+                    case 'basic':
+                        Fight(player,"basic");
+                    break;
+                    case 'support':
+                        Fight(player,"support");
+                    break;
+                    case 'charge':
+                        Fight(player,"charge");
+                    break;         
+                    case 'forward':
+                        Forward(player);
+                    break;
+                    case 'descend':
+                        Descend(player);
+                    break;
+                    case 'interact':
+                        Interact(party[user[player].party].enemies[user[player].opponent],player);
+                    break;
+                    case 'check':
+                        Check(user[player].opponent,player);
+                    break;
+                    case 'special':
+                        if(user[player].cooldown <= 0){
+                            Fight(player,true,true);
+                        } else {
+                            const embed = new Discord.RichEmbed()
+                            embed.setTitle("You need more battle commands to use your special attack! " + user[player].cooldown + " more commands needed!")
+                            PartyAction(embed,player);
+                        }
+                    break;
+                    case 'block':
+                        Fight(player,false);
+                    break;
+                   
+                }  
+                    
+        }); 
+        //Restart the reaction collector if it ends.
+        collector.on('end',r =>{
+            Log(user[player].name + "'s collector ended, booting up a new one.")
+            PlayerCommands(instance,player);
+        });
+}
+//Restart said Instance
+function RebootInstance(player){
+    //If the player had a party instance and a channel after a reboot.
+    //Reactivate the reaction collectors.
+    if(!user[player].partyChannel || !user[player].party){
+      return;
+    }
+    var thechannel = bot.channels.get(user[player].partyChannel); 
+    var thestatschannel = bot.channels.get(user[player].statsChannel);
+    var theadminchannel;
+    if(admin[player]){
+      theadminchannel = bot.channels.get(admin[player].boardChannel);
+      if(admin[player].board != null){
+          theadminchannel.fetchMessage(admin[player].board).then ( instance =>{      
+          //console.log("Rebooting Board");
+          AdminDashboard(instance,player);                
+        });  
+      }
+    }
+  
+    if(user[player].party != 0){
+      thechannel.fetchMessage(user[player].party).then ( instance =>{      
+      //console.log("Rebooting Instance");
+      PlayerCommands(instance,player);                
+    }); 
+    if(user[player].stats != null){
+        thestatschannel.fetchMessage(user[player].stats).then ( instance =>{      
+        //console.log("Rebooting Stats");
+        PlayerStatus(instance,player);                
+        });  
+    } 
+    
+  }
+}
+//Apply Changes to Status Window
+function StatusAction(action, player){
+    var channel = bot.channels.get(user[player].statsChannel); 
+    if(user[player].stats != 0){
+        channel.fetchMessage(user[player].stats).then (sentEmbed =>{         
+                 sentEmbed.edit(action);                
     });           
 } else {
     channel.send("Please type in the channel that your party instance is in.");
 }}
+//Apply Changes to Instance Window
+function PartyAction(action, player){
+    var channel = bot.channels.get(user[player].partyChannel); 
+    if(user[player].party != 0){
+        channel.fetchMessage(user[player].party).then (sentEmbed =>{         
+                 sentEmbed.edit(action);                
+    });           
+} else {
+    channel.send("Please type in the channel that your party instance is in.");
+}
+}
+//Log
 function Log(action){
-    var path = 'game/log.txt';
     var currentdate = new Date(); 
-    var datetime = "Time: " + currentdate.getDate() + "/"
+    var datetime = currentdate.getDate() + "/"
                 + (currentdate.getMonth()+1)  + "/" 
                 + currentdate.getFullYear() + " @ "  
                 + currentdate.getHours() + ":"  
                 + currentdate.getMinutes() + ":" 
                 + currentdate.getSeconds();
-    fs.appendFileSync(path, action + " " + datetime +'\n', "UTF-8",{'flags': 'a+'}); 
+    var log = bot.channels.get("592519951060041738");
+    log.send(datetime + ": " + action);
+}
+//Create Stats Window
+function CreateStats(instance,player){
+    user[player].stats = instance.id;
+    user[player].statsChannel = instance.channel.id;
+    Log(user[player].name + " has created new stats");
+}
+//Create Instance Window
+function CreateParty(instance,player){
+    user[player].party = instance.id; //ID of the channel.
+    user[player].partyChannel = instance.channel.id; //Channel the instance is in
+    user[player].opponent = "Nothing"; //What are we facing?
+    //console.log(user[player].party);
+    party[instance.id] = {};
+    party[instance.id].enemies = {};
+    
+    //console.log("New Instance")
+    Log(user[player].name + " has created a new instance");
+}
+//Create Admin Dashboard Window
+function CreateAdmin(instance,player){
+    admin[player] = {};
+    admin[player].board = instance.id;
+    admin[player].boardChannel = instance.channel.id;
+    admin[player].job = "Grant";
+    admin[player].page = "Weapon";
+    admin[player].index = 0;
+    admin[player].choice = "Calibur";
+    admin[player].choiceAmount = 1;
+    Log(user[player].name + " has created a dashboard.");
+}
+//Admin Dashboard Commands/Reactions
+function AdminDashboard(instance,player){
+    var actions = [confirmEmoji,removeEmoji,nextEmoji,previousEmoji,increaseEmoji,decreaseEmoji];
+    const filter = (reaction, user) => actions.includes(reaction.emoji.id) && user.id === player
+    const collector = instance.createReactionCollector(filter, { max: 10000000, time: 2147483647 });
+                collector.on('collect', r => {
+                    //If maintenance mode is turned on, don't let users interact.
+                if(!user[player].admin)   {
+                    //console.log(user[player].name + " is not an Admin.")
+                    return;
+                }
+                switch(r.emoji.name){  
+                    case "confirm":
+                        AddItem(admin[player].choice,player,admin[player].choiceAmount);
+                        var embed = new Discord.RichEmbed();
+                        embed.setTitle("Item Granted");
+                        AdminAction(embed,player);
+                    break;
+                    case "remove":
+                        AddItem(admin[player].choice,player,-admin[player].choiceAmount);
+                        var embed = new Discord.RichEmbed();
+                        embed.setTitle("Items Removed");
+                        AdminAction(embed,player);
+                    break;
+                    case "next":
+                        FindItem(player,1);
+                    break;
+                    case "previous":
+                        FindItem(player,-1);
+                    break;
+                    case "increase":
+                        admin[player].choiceAmount += 1;
+                        FindItem(player,0);
+                     
+                    break;
+                    case "decrease":
+                        admin[player].choiceAmount -= 1;
+                        FindItem(player,0);       
+                    break;
+                }             
+        }); 
+        //Restart the reaction collector if it ends.
+        collector.on('end',r =>{
+            Log(user[player].name + "'s collector ended, booting up a new one.")
+            AdminDashboard(instance,player);
+        });
+}
+function FindItem(player,index = 0, item = null){
+    var embed = new Discord.RichEmbed();
+    admin[player].index += index;
+    embed.setTitle("Item Viewer");
+    embed.addField("Tutorial", "Use the up and down arrows to increase/decrease the amount you want to give.  Use confirm to add items, remove to remove items.")
+    embed.addField("Count",admin[player].choiceAmount);
+
+    var materialList = [];
+    var weaponList = [];
+    var trinketList = [];
+    var usableList = [];
+    var rarityList = [];
+    var recipeList = [];
+ 
+    
+    //Sorting
+    for(var key in items){
+        switch(items[key].type){
+            case "Material":
+                materialList.push(key);
+            break;
+            case "Sword":
+                weaponList.push(key);
+            break;
+            case "Gun":
+                weaponList.push(key);
+            break;
+            case "Usable":
+                usableList.push(key);
+            break;
+            case "Trinket":
+                trinketList.push(key);
+            break;
+            case "Rarity":
+                rarityList.push(key);
+            break;
+            case "Recipe":
+                recipeList.push(key);
+            break;
+        }
+    }
+
+    //Pages
+    switch(admin[player].page){
+        case "Material":
+            if(admin[player].index >= materialList.length){
+                admin[player].index = 0; 
+            }
+            
+            var myItem = items[materialList[admin[player].index]];
+            if(item != null) { myItem = item; }
+
+            admin[player].choice = materialList[admin[player].index];
+            embed.addField("Name",myItem.name);
+            embed.addField("Type",myItem.type);
+            embed.addField("Description",myItem.description);
+            embed.setThumbnail(myItem.art);
+        break;
+        case "Weapon":
+            if(admin[player].index >= weaponList.length){
+                admin[player].index = 0; 
+            }
+            var myItem = items[weaponList[admin[player].index]];
+            if(item != null) { myItem = item; }
+
+            admin[player].choice = weaponList[admin[player].index];
+            embed.addField("Name",myItem.name);
+            embed.addField("Damage",myItem.damage);
+            embed.addField("DamageType",myItem.damageType);
+            embed.addField("Basic Move",myItem.basic);
+            embed.addField("Support Move", myItem.support);
+            embed.addField("Charge Move", myItem.charge);
+            embed.addField("Hit Rate", myItem.range + "%");
+            embed.addField("Buy Price", myItem.crowns);
+            embed.addField("Type",myItem.type);
+            embed.addField("Description",myItem.description);
+            embed.setThumbnail(myItem.art);
+        break
+        case "Usable":
+            if(admin[player].index >= usableList.length){
+                admin[player].index = 0; 
+            }
+            var myItem = items[usableList[admin[player].index]];
+            if(item != null) { myItem = item; }
+
+            admin[player].choice = usableList[admin[player].index];
+            embed.addField("Name",myItem.name);
+            embed.addField("Usage", myItem.usage);
+            embed.addField("Effect",myItem.effect);
+            if(myItem.value){
+                embed.addField("Value",myItem.value)
+            }       
+            embed.addField("Type",myItem.type);
+            embed.addField("Description",myItem.description);
+            embed.setThumbnail(myItem.art);
+        break;
+        case "Trinket":
+            if(admin[player].index >= trinketList.length){
+                admin[player].index = 0; 
+            }
+            var myItem = items[trinketList[admin[player].index]];
+            if(item != null) { myItem = item; }
+
+            admin[player].choice = trinketList[admin[player].index];
+            embed.addField("Name",myItem.name);
+            embed.addField("Type",myItem.type);
+            embed.addField("Damage Boost", myItem.damageBoost);
+            embed.addField("Damage Type", myItem.damageType);
+            embed.addField("Health Boost", myItem.healthBoost);
+            embed.addField("Family Boost", myItem.familyBoost);
+            embed.addField("Weapon Boost",myItem.weaponBoost);
+            enbed.addField("Defense Boost", myItem.defenseBoost);
+            embed.addField("Description",myItem.description);
+            embed.setThumbnail(myItem.art);
+        break;
+        case "Rarity":
+            if(admin[player].index >= rarityList.length){
+                admin[player].index = 0; 
+            }
+            var myItem = items[rarityList[admin[player].index]]; 
+            if(item != null) { myItem = item; }
+
+            admin[player].choice = rarityList[admin[player].index];
+            embed.addField("Name",myItem.name);
+            embed.addField("Type",myItem.type);
+            embed.addField("Description",myItem.description);
+            embed.setThumbnail(myItem.art);   
+        break;
+        case "Recipe":
+            if(admin[player].index >= recipeList.length){
+                admin[player].index = 0; 
+            }
+            var myItem = items[recipeList[admin[player].index]];
+            if(item != null) { myItem = item; }
+
+            admin[player].choice = recipeList[admin[player].index];
+            embed.addField("Name",myItem.name);
+            embed.addField("Type",myItem.type);
+            embed.addField("Description",myItem.description);
+            embed.setThumbnail(myItem.art);  
+        break;
+    }
+    AdminAction(embed,player);
+}
+//Admin Actions
+function AdminAction(action,player){
+    var channel = bot.channels.get(admin[player].boardChannel); 
+    if(admin[player].board != 0){
+        channel.fetchMessage(admin[player].board).then (sentEmbed =>{         
+                 sentEmbed.edit(action);                
+    });           
+    } else {
+        channel.send("Please type in the channel that your party instance is in.");
+    }
 }
 
 bot.on('messageUpdate', message =>{
-   // userData[message.author.id].channel = message.channel.id;
+   // user[message.author.id].channel = message.channel.id;
     SaveData();
 })
 bot.on('message', message=> {
@@ -1117,98 +1779,126 @@ bot.on('message', message=> {
         return;
     } 
     let player = message.author.id;
-    
-    if(!userData[player]) {
-        Log(message.author.username + " a new player has joined the game!");
-        userData[player] = {};
-        userData[player].name  = message.author.username;
-        userData[player].health  = 20;
-        userData[player].maxHealth = 20;
-        userData[player].rank = "Recruit";
-        userData[player].experience = 0;
-        userData[player].crowns = 0;   
-        userData[player].items = {"Calibur":{"name":"Calibur","amount":1}}; 
-        userData[player].equipped = "Calibur";
-        userData[player].downTime = 0;
-        userData[player].location = 0;
-        userData[player].depth = 0;
-        userData[player].partyInstance = 0;
-        userData[player].partyChannel = null;  
-        userData[player].trinket = {};
-        userData[player].cooldown = 0;   
+    if(!user[player]) {
+        Log(message.author.username + " a new player has joined the game! New data created for them.");
+        user[player] = {};
+        user[player].name  = message.author.username;
+        user[player].health  = 20;
+        user[player].maxHealth = 20;
+        user[player].rank = "Recruit";
+        user[player].experience = 0;
+        user[player].crowns = 0;   
+        user[player].items = {"Calibur":{"name":"Calibur","amount":1}}; 
+        user[player].page = 0;
+        user[player].mist = 100;
+        user[player].maxMist = 100;
+        user[player].art = message.author.avatarURL;
+        user[player].equipped = "Calibur";
+        user[player].equipment = {};
+        user[player].equipment["Calibur"] = items["Calibur"];
+        user[player].equipment["Calibur"].level = 1;
+        user[player].equipment["Calibur"].maxLevel = 10;
+        user[player].equipment["Calibur"].heat = 0;
+        user[player].equipment["Calibur"].maxHeat = 100;
+        user[player].downTime = false;
+        user[player].location = 0;
+        user[player].depth = 0;
+        user[player].party = 0;
+        user[player].opponent = "Nothing";
+        user[player].partyChannel = null;  
+        user[player].trinket = {};
+        user[player].cooldown = 0;   
     } 
-    if(!userData[player].trinket){
-        userData[player].trinket = {};
-        userData[player].cooldown = 0;  
+    if(message.author.username != user[player].name){
+        user[player].name  = message.author.username;
     }
-    userData[player].myChannel = message.channel.id;
-    if(message.author.username != userData[player].name){
-        userData[player].name  = message.author.username;
-    }
+    if(!user[player].opponent) { user[player].opponent = "Nothing"; }
+    if(!user[player].party) { user[player].party = 0;}
     var myRole;
     let args = message.content.substring(prefix.length).split(" ");
+
+    //Text
     if(message.channel.type === "text"){
         myRole = message.guild.roles.find(role => role.name === "Bot Admin").id;
-        ////console.log(myRole);
-    }  
-   // //console.log(message.channel.type);
-    
-    
-    function CreateParty(instance){
-        userData[player].partyInstance = instance.id;
-        userData[player].partyChannel = instance.channel.id;
-        Log(userData[player].name + " has created a new instance");
+        admin.role = myRole;
+    }
+
+    user[player].admin = message.member.roles.has(myRole);
+ 
+    //If maintenance mode is enabled don't let players interact.
+    if(admin.maintenance && !user[player].admin){
+        //console.log(message.author.username + " is not an Admin.")
+        return;
     }
     switch(args[0]){
-        case 'help':
-            const embed = new Discord.RichEmbed()
-            .setTitle('Help')
-            .addField('Commands', commands)
-            .setColor(0xFCF200)
-            PartyAction(embed,player);
-            message.delete();
+        case 'user':
+            if(!message.member.roles.has(myRole)){
+                message.reply("Admin Command.")
+                message.delete();s
+                return;        
+            }
+            var players = [];
+            for (var key in user){
+                players.push(user[key].name + " ");
+            }
+            message.reply("Current Playerbase: " + players);
         break;
-        //Player Inventory
-        case 'inventory':
-            if(userData[player].myChannel != userData[player].partyChannel){
-                message.author.send("Don't do commands in other channels!")
+        case 'find':     
+            if(!message.member.roles.has(myRole)){
+                message.reply("Admin Command.")
                 message.delete();
+                return;        
+            }
+            if(!admin[player]){
+                message.reply("Please open a dashboard.");
                 return;
             }
-        
-            if(userData[player].downTime > 0){
-                //console.log("You can't do anything!");
-                return;
-            }
-            if(userData[player].partyInstance === 0){
-                message.author.send("You need to create a party instance first. do !create");
-          
-                return;
-            }  
-            Inventory(player);     
-            message.delete();
-        break;
-        /*
-        case 'bid':
-            if(!args[1] || !args[2]){
-                message.author.send("Invalid Arguments");
-                message.delete();
-                return;
-            }
-            var myBid = parseInt(args[2]);
-            var auction = args[1];
-            if(auctions[auction] != null){
-                if(userData[player].crowns >= myBid && myBid >= auctions[auction].minimum){
-                    BidAuction(auction,myBid,player);
-                } else {
-                    message.author.send("Not enough crowns."); 
+            var search = "";
+            for (var i = 1; i < args.length; i++) {
+                search += args[i].toString();
+                if (args[i + 1] != null) {
+                    search += " ";
                 }
+            }
+            if(items[search]){
+                admin[player].page = items[search].type;
+                if(admin[player].page === "Sword") { admin[player].page = "Weapon"; }
+                if(admin[player].page === "Gun") { admin[player].page = "Weapon"; }
+                admin[player].choice = items[search].name;
+                FindItem(player,admin[player].index,items[search]);
             } else {
-                message.author.send("Invalid ID");
+                message.reply("Invalid Item: " + search);
             }
             message.delete();
         break;
-*/
+        case 'page':
+            if(!admin[player]){
+                message.reply("Please open a dashboard.");
+                return;
+            }
+                if(message.member.roles.has(myRole)){
+                    admin[player].page = args[1];          
+                } else {
+                    message.reply("Admin Command.")
+                }
+                message.delete();
+        break;
+        //#region maintenance (Admin Command)
+        case 'maintenance':
+            if(message.member.roles.has(myRole)){
+                if(!admin.maintenance){
+                    admin.maintenance = true;
+                } else {
+                    admin.maintenance = !admin.maintenance;
+                }
+                message.reply("Maintenance Mode set to " + admin.maintenance);
+                message.delete();
+            } else {
+                message.reply("Admin Command.")
+            }
+        break;
+        //#endregion
+        //#region deposit
         case 'deposit':
             if(!args[1] || !args[2]){
                 message.author.send("Invalid Arguments");
@@ -1225,12 +1915,12 @@ bot.on('message', message=> {
                 }
             }
             var amount = parseInt(args[args.length - 1].toString());
-            //console.log(mineral.toUpperCase())
+            ////console.log(mineral.toUpperCase())
             if(gate.minerals[mineral.toUpperCase()] != null){
-                if(userData[player].items[mineral]){
-                    if(userData[player].items[mineral].amount >= amount){
+                if(user[player].items[mineral]){
+                    if(user[player].items[mineral].amount >= amount){
                         gate.minerals[mineral.toUpperCase()] += amount;
-                        userData[player].items[mineral].amount -= amount;
+                        user[player].items[mineral].amount -= amount;
                         message.author.send("Deposited " + amount + " " + mineral)
                     } else {
                             message.author.send("You don't have enough of said mineral."); 
@@ -1243,7 +1933,83 @@ bot.on('message', message=> {
             }
             
             message.delete();
+        break;  
+        //#endregion
+        //#region Player Inventory
+        case 'inventory':
+            if(user[player].party === 0){
+                message.author.send("You need to create a party instance first. do !create");
+                 return;
+            }
+            if(!args[1]){
+                message.author.send("Specify Page Number")
+                message.delete();
+                return;
+            }
+            if(user[player].downTime > 0){
+                ////console.log("You can't do anything!");
+                return;
+            }
+            if(user[player].partyInstance === 0){
+                message.author.send("You need to create a party instance first. do !create");
+          
+                return;
+            }  
+            NextPage(player,parseInt(args[1]),true);     
+            message.delete();
         break;
+         //#endregion
+        //#region buy
+         case 'buy':
+                if(user[player].party === 0){
+                    message.author.send("You need to create a party instance first. do !create");
+                    return;
+                }
+                if(user[player].downTime > 0){
+                    ////console.log("You can't do anything!");
+                    return;
+                }
+                if(!args[1]){
+                    message.author.send("Specify Item");
+                    message.delete();
+                    return;
+                }
+                var purchase = "";
+                for(var i = 1; i < args.length; i++){
+                    purchase += args[i].toString();
+                    if(args[i + 1]){
+                        purchase += " ";
+                    }
+                }
+                ////console.log(purchase + " I want to buy this ");
+                if(party[user[player].party].enemies[user[player].opponent].name === "Basil" || party[user[player].party].enemies[user[player].opponent].name === "Grasil"){
+                    ////console.log("Basil is here")
+                    if(party[user[player].party].enemies[user[player].opponent].stock.includes(purchase)){
+                        Buy(purchase,player);
+                    } else {
+                        message.author.send("Basil isn't here or that item isn't available");
+                    }
+                }   
+                message.delete();
+            break; 
+            //#endregion
+        //#region restart
+            case 'restart':
+            if(user[player].party === 0){
+                message.author.send("You need to create a party instance first. do !create");
+                return;
+            }
+            var restart = new Discord.RichEmbed()
+            restart.setTitle("Starting from the begining!")
+            user[player].location = 0;
+            user[player].depth = 0;
+            user[player].downTime = false;
+            user[player].health = user[player].maxHealth;
+            party[user[player].party].enemies[user[player].opponent].health = 0;
+            PartyAction(restart,player);
+        break; 
+        //#endregion
+        //#region auction
         /*
         case 'auction':
             if(!args[5]){
@@ -1256,25 +2022,26 @@ bot.on('message', message=> {
             for (var i = 1; i < args.length; i++) {
                 if(items[myItem] != null){
                     numbers = i;
-                    //console.log(args[i]);
+                    ////console.log(args[i]);
                     break;
                 } else {
-                    //console.log(myItem + " Item doesn't exist");
+                    ////console.log(myItem + " Item doesn't exist");
                     myItem += args[i].toString();
                     if(!items[myItem]){
                         myItem += " ";
                     }       
                 }       
             }
-            //console.log(myItem);
-            if(userData[player].items[myItem] != null){
-                if(userData[player].items[myItem].amount > parseInt(args[numbers])){
+            ////console.log(myItem);
+            if(user[player].items[myItem] != null){
+                if(user[player].items[myItem].amount >= parseInt(args[numbers])){
                     var amount = parseInt(args[numbers]);
                     var bid = parseInt(args[numbers + 1]);
                     var price = parseInt(args[numbers + 2]);
                     var time = parseInt(args[numbers + 3]);
-                    if(time != null){
-                        NewAuction(myItem,amount,bid,price,time,player);
+                    if(time != 0 && time != null){
+                       // NewAuction(myItem,amount,bid,price,time,player);
+                        user[player].items[myItem].amount -= amount;
                     } else {
                         message.author.send("Please specify time, in seconds.");
                         message.delete();
@@ -1285,55 +2052,11 @@ bot.on('message', message=> {
                 message.author.send("You don't have this item");
             }
             message.delete();
-        break; 
-        */
-        case 'interact':
-            if(userData[player].partyInstance === 0){
-                message.author.send("You need to create a party instance first. do !create");
-                message.delete();
-                return;
-            } 
-            if(userData[player].myChannel != userData[player].partyChannel){
-                message.author.send("Don't do commands in other channels!")
-                message.delete();
-                return;
-            }
-            if(userData[player].downTime > 0){
-                message.author.send("You're dead.");
-                message.delete();
-                return;
-            }
-            if(enemies.depth[userData[player].depth].location[userData[player].location].enemy != null){
-                if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.interaction != null){
-                    Interact(enemies.depth[userData[player].depth].location[userData[player].location].enemy,player);
-                }else {
-                    message.author.send("Nothing to interact with here");
-                }
-            } else {
-                message.author.send("Nothing to interact with here");
-            }
-            message.delete();
-        break;
-        case 'restart':
-            userData[player].health = userData[player].maxHealth;
-            userData[player].downTime = 0;
-            userData[player].depth = 0;
-            userData[player].location = 0;
-            const restart = new Discord.RichEmbed()
-            restart.setTitle("Restarting Gate!")
-            restart.addField("Let's try this all over again.", "Back to depth 0!")
-            PartyAction(restart,player);
-            message.delete();
-        break;
-        //Equips an item
+        break;  */
+        //#endregion 
+        //#region Equips an item
         case 'equip':
-            if(userData[player].myChannel != userData[player].partyChannel){
-                message.author.send("Don't do commands in other channels!")
-                message.delete();
-                return;
-            }
-        
-            if(userData[player].partyInstance === 0){
+            if(user[player].party === 0){
                 message.author.send("You need to create a party instance first. do !create");
                 return;
             }
@@ -1346,102 +2069,54 @@ bot.on('message', message=> {
                 item += args[i].toString();
                 if (args[i + 1] != null) {
                     item += " ";
-                }
-            }
+                }        }
           
-            if(userData[player].items[item] && userData[player].equipped != item){ 
+            if(user[player].items[item]){ 
                 if(items[item].type === "Sword" || items[item].type === "Gun"){
-                    userData[player].equipped = item;
-                    message.author.send("Equipped " + item)
-                    Inventory(player);
-                    Log(userData[player].name + " has equipped " + item);
+                   // if(!user[player].equipment) {user[player].equipment = {};}
+                   if(user[player].items[item]){
+                       if(user[player].items[item].amount > 0){
+                           
+                       } else {
+                           message.author.send("You don't have " + item);
+                           return;
+                       }
+                   } else {
+                       message.author.send("You don't have " + item);
+                       return;
+                   }
+                    Equip(player,item);
+
+                    Log(user[player].name + " has equipped " + items[item].name);
                 } else if (items[item].type === "Trinket"){
-                    userData[player].trinket = items[item];
-                    message.author.send("Equipped " + item)
-                    Inventory(player);
-                    Log(userData[player].name + " has equipped " + item);
+
+                    user[player].trinket = items[item];
+                    const trink = new Discord.RichEmbed();
+                    trink.setTitle("Equipped " + item);
+                    PartyAction(trink,player);
+                    
+                    if(items[item].damageType === "Health"){
+                        user[player].maxHealth = Math.floor(20 * items[item].healthBoost);
+                    }
+
+                    Log(user[player].name + " has equipped " + items[item].name);
                 } else {
                     message.author.send("This is not a weapon or trinket.")
-                }
-                
-            } else if (userData[player].equipped === item){
-                message.author.send("That equipment is already equipped");
+                }             
             } else {
                 message.author.send("Item does not exist");
             }
             message.delete();
         break;
-        case 'fight':
-            if(userData[player].myChannel != userData[player].partyChannel){
-                message.author.send("Don't do commands in other channels!")
-                message.delete();
-                return;
-            }
-            if(userData[player].downTime > 0){
-                //console.log("You can't do anything!");
-                return;
-            }
-            if(userData[player].partyInstance === 0){
-                message.author.send("You need to create a party instance first. do !create");
-               
-            return;
-            }
-            if(userData[player].downTime != 0){
-                return;
-            }
-            if(!args[1]){
-                message.author.send("Invalid Arguments");
-                return;
-            }
-            var target = "";
-            for(var i = 1; i < args.length; i++){
-                target += args[i].toString();
-                if(args[i + 1]){
-                    target += " ";
-                }
-            }
-            if(enemies.depth[userData[player].depth].location[userData[player].location].enemy != null){   
-                //console.log("Fight enemy");
-                if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.name.toUpperCase() === target.toUpperCase())    {
-                    //console.log("Fight enemy");
-                    Fight(target, player , false);
-                }  else {
-                    message.author.send("This enemy doesn't exist.");
-                }         
-            }  else {
-                message.author.send("This enemy doesn't exist.");
-            } 
-            message.delete(); 
-        break; 
-        //Spawns a specific dungeon.
-        case 'dungeon':{
-            if(message.member.roles.has(myRole)){
-                if(!args[1]){
-                    message.author.send("Invalid Arguments.");
-                    return;
-                }
-                var wish = args[1].toString();
-                if(dungeons[wish]){
-                    dungeon[wish] = GenerateDungeon(wish);
-                    message.author.send("Wish Granted, Dungeon Created");
-                } else {
-                    message.author.send("Invalid Dungeon.");
-                }
-            } else {
-                message.author.send("You do not have the neccessary roles.");
-            }  
-          
-        }
-        break;
-        //Grants any item in the game
+        //#endregion
+        //#region Crafting
         case 'craft':
-            if(userData[player].myChannel != userData[player].partyChannel){
-                message.author.send("Don't do commands in other channels!")
-                message.delete();
+            if(user[player].party === 0){
+                message.author.send("You need to create a party instance first. do !create");
                 return;
             }
-            if(userData[player].downTime > 0){
-                //console.log("You can't do anything!");
+            if(user[player].downTime > 0){
+                ////console.log("You can't do anything!");
                 return;
             }
             if(!args[1]){
@@ -1458,10 +2133,10 @@ bot.on('message', message=> {
             craft.setTitle("Attempting to craft " + choice)
             if(items[choice]){
                 
-                var myItems = userData[player].items;
+                var myItems = user[player].items;
               
                     if(!myItems[choice + " Recipe"]){
-                        //console.log("Can't craft this, don't have the recipe.");
+                        ////console.log("Can't craft this, don't have the recipe.");
                         craft.addField("Failure", "You don't have this recipe.")
                         message.delete();
                         PartyAction(craft,player);
@@ -1471,7 +2146,7 @@ bot.on('message', message=> {
                     var missing = [];
                     for(var i = 0; i < items[choice + " Recipe"].needed.length; i++){
                         var requirement = items[choice + " Recipe"].needed[i];
-                        //console.log(requirement);
+                        ////console.log(requirement);
                         if(myItems[requirement]){
                             if(myItems[requirement].amount >= items[choice + " Recipe"].amounts[i]){
                                 attemptcraft.push("True");
@@ -1486,27 +2161,29 @@ bot.on('message', message=> {
                     }
                     if(attemptcraft.includes("False")){
                         craft.addField("Failure", "You are missing some materials: " + missing)
-                        //console.log("Missing Materials!");
+                        ////console.log("Missing Materials!");
                     } else {
-                        //console.log("Crafting Success!");
+                        ////console.log("Crafting Success!");
                         for(var i = 0; i < items[choice + " Recipe"].needed.length; i++){
                             var requirement = items[choice + " Recipe"].needed[i];
-                            userData[player].items[requirement].amount -= items[choice + " Recipe"].amounts[i];
-                            //console.log("Removing Materials...");
+                            user[player].items[requirement].amount -= items[choice + " Recipe"].amounts[i];
+                            ////console.log("Removing Materials...");
                         }
                         craft.addField("Success!", "Enjoy your new " + choice)
                         AddItem(choice,player);
                     }
                 
             } else {
-                //console.log("Can't craft this, don't have the recipe.");
+                ////console.log("Can't craft this, don't have the recipe.");
                 craft.addField("Failure", "this item doesn't exist") 
             }
             message.delete();
             PartyAction(craft,player);
         break;
+        //#endregion
+        //#region Usables
         case'use':
-            if(userData[player].partyChannel != message.channel.id){
+            if(user[player].partyChannel != message.channel.id){
                 message.author.send("Don't do commands in other channels!");
                 return;
             }
@@ -1521,11 +2198,11 @@ bot.on('message', message=> {
                     object += " ";
                 }
             }
-            //console.log(userData[player].name + " is attempting to use " + object + "!");
+            ////console.log(user[player].name + " is attempting to use " + object + "!");
             if(items[object] != null){
-                if(userData[player].items[object] != null){
+                if(user[player].items[object] != null){
                     if(items[object].type === "Usable"){
-                        if(userData[player].items[object].amount > 0){
+                        if(user[player].items[object].amount > 0){
                             UseItem(object,player);
                         } else {
                             message.author.send("This item is not in your inventory.");
@@ -1541,37 +2218,8 @@ bot.on('message', message=> {
             }
             message.delete();
         break;
-        case 'buy':
-            if(userData[player].myChannel != userData[player].partyChannel){
-                message.author.send("Don't do commands in other channels!")
-                message.delete();
-                return;
-            }
-            if(userData[player].downTime > 0){
-                //console.log("You can't do anything!");
-                return;
-            }
-            if(!args[1]){
-                message.author.send("Specify Item");
-            }
-            var purchase = "";
-            for(var i = 1; i < args.length; i++){
-                purchase += args[i].toString();
-                if(args[i + 1]){
-                    purchase += " ";
-                }
-            }
-            //console.log(purchase + " I want to buy this ");
-            if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.name === "Basil"){
-                //console.log("Basil is here")
-                if(enemies.depth[userData[player].depth].location[userData[player].location].enemy.stock.includes(purchase)){
-                    Buy(purchase,player);
-                } else {
-                    message.author.send("Basil isn't here or that item isn't available");
-                }
-            }   
-            message.delete();
-        break;
+        //#endregion
+        //#region Grant Item (Admin Command)
         case 'grant':
             if(message.member.roles.has(myRole)){
                 if(!args[1]){
@@ -1579,52 +2227,124 @@ bot.on('message', message=> {
                     return;
                 }
                 var wish = "";
+                var start = 0;
                 for(var i = 1; i < args.length; i++){
-                        wish += args[i].toString();
+                    wish += args[i].toString();
+                    if(args[i] === "Crowns"){
+                        start = i;
+                        break;
+                    }
+                    if(items[wish]){
+                        start = i;
+                        break;
+                    }
+                       
                     if(args[i + 1]){
                         wish += " ";
                     }
                 }
-                if(items[wish]){
-                    AddItem(wish,player);   
-                    message.author.send("Wish Granted.");
-                } else {
-                    message.author.send("Invalid Item.");
+                var target = "";
+                var amount = parseInt(args[args.length - 1]);
+                
+                for(var i = start + 1; i < args.length; i++){
+                    target += args[i].toString();
+                    for(var key in user){
+                        if(user[key].name === target){
+                            if(wish === "Crowns"){
+                                user[key].crowns += amount;
+                                message.author.send("Wish Granted.");
+                                return;
+                            }
+                            if(items[wish]){
+                               
+                                AddItem(wish,key,amount);   
+                                message.author.send("Wish Granted.");
+                            } else {
+                                message.author.send("Invalid Item.");
+                            }
+                        }
+                    }
+                    if(args[i + 1]){
+                        target += " ";
+                    }
                 }
+                //console.log(wish);
+                //console.log(target);
+                //console.log(amount);
             } else {
                 message.author.send("You do not have the neccessary roles.");
             }  
             message.delete();
         break;
-        //Restarts the dungeon, pututing you at location 1 depth 0
-        case 'start':{
-            if(message.member.roles.has(myRole)){
-                message.channel.send("Retarting Dungeon!");
-                userData[player].location = 1;
-                userData[player].depth = 0;
-            } else {
-                message.author.send("You do not have the neccessary roles.");
-            }   
-                  
+        //#endregion
+       
+        case 'dashboard':{
+            if(!message.member.roles.has(myRole)){
+                message.reply("Admin Command.")
+                return;
+            }
+            var server = message.channel;
+            const embed = new Discord.RichEmbed();
+            embed.setTitle(user[player].name + "'s Admin Dashboard")
+            server.send(embed).then  (async function (sentEmbed) {
+                await sentEmbed.react(confirmEmoji);
+            await sentEmbed.react(removeEmoji);
+                await sentEmbed.react(increaseEmoji);
+                await sentEmbed.react(decreaseEmoji);
+                await sentEmbed.react(previousEmoji);
+                await sentEmbed.react(nextEmoji);
+             
+                sentEmbed.edit("Ready to go!");
+                CreateAdmin(sentEmbed,player);
+                AdminDashboard(sentEmbed,player);            
+            });  
+            message.delete();
         }
         break;
-        //Creates a party instance for the player, this is what you use to play the game.
+
+        case 'count':
+            if(!admin[player]){
+                message.reply("Please open a dashboard.");
+                return;
+            }
+            if(!message.member.roles.has(myRole)){
+                message.reply("Admin Command.")
+                message.delete();
+                return;        
+            }
+            try {
+                admin[player].choiceAmount = parseInt(args[1]);
+                FindItem(player,0);
+            } catch {
+                message.reply("Not a number");
+            }
+            message.delete();
+        break;
+        //#region Create Party
         case 'create':{
-            if(userData[player].downTime > 0){
-                //console.log("You can't do anything!");
+            if(user[player].downTime > 0){
+                ////console.log("You can't do anything!");
                 return;
             }
             //The Party Instance id is automatically set to 0 from the start.
             const embed = new Discord.RichEmbed();
+            const stats = new Discord.RichEmbed();
             //Can create private parties, which creates an entire channel for you.
             if(args[1] === "private"){
+                message.author.send("The term private is not used anymore.  Simply do .create");
+                
+            } else {   
                 var server = message.guild;
                 var name = message.author.username;
                 let playerRole = message.guild.roles.find(x => x.name === name);
-                let playerChannel = message.guild.channels.get(userData[player].partyChannel);
-                
+                let playerChannel = message.guild.channels.get(user[player].partyChannel);
+                let playerStatsChannel = message.guild.channels.get(user[player].statsChannel);
+
                 if(playerRole != null){
                     playerChannel.delete();
+                    if(playerStatsChannel != null){
+                        playerStatsChannel.delete();
+                    }  
                     playerRole.delete();
                     message.author.send("Deleting old party...")
                 }
@@ -1633,11 +2353,11 @@ bot.on('message', message=> {
                 message.guild.createRole({
                     name: message.author.username,
                 }).then (newRole =>{
-                    server.createChannel(name, "text").then (myServer =>{
+                    server.createChannel(name + "s Party", "text").then (myServer =>{
                     myServer.overwritePermissions(everyone,{
-                        VIEW_CHANNEL: false,
+                        VIEW_CHANNEL: true,
                         SEND_MESSAGES: false,
-                        READ_MESSAGE_HISTORY: false,
+                        READ_MESSAGE_HISTORY: true,
                     })
                     myServer.overwritePermissions(newRole,{
                         VIEW_CHANNEL: true,
@@ -1651,98 +2371,58 @@ bot.on('message', message=> {
                     })
                    
                     message.member.addRole(newRole);
-                    embed.setTitle(userData[player].name + "'s instance")
+                    embed.setTitle(user[player].name + "'s instance")
                         myServer.send(embed).then  (async function (sentEmbed) {
                             await sentEmbed.react(fightEmoji);
-                            await sentEmbed.react(specialEmoji);
-                            await sentEmbed.react(blockEmoji);
+                            await sentEmbed.react(supportEmoji);
+                            await sentEmbed.react(chargeEmoji);
                             await sentEmbed.react(forwardEmoji);
-                            await sentEmbed.react(inventoryEmoji);
-                            await sentEmbed.react(gateEmoji);
+                            await sentEmbed.react(checkEmoji);
+                            await sentEmbed.react(interactEmoji);
                             await sentEmbed.react(descendEmoji);
-                            CreateParty(sentEmbed);
+                         
+                            sentEmbed.edit("Ready to go!");
+                            CreateParty(sentEmbed,player);
                             PlayerCommands(sentEmbed,player);
                             
-                        });       
+                        });  
+                        
                 }) 
+                    server.createChannel(name +"s Stats", "text").then (myServer =>{
+                        myServer.overwritePermissions(everyone,{
+                            VIEW_CHANNEL: false,
+                            SEND_MESSAGES: false,
+                            READ_MESSAGE_HISTORY: false,
+                        })
+                        myServer.overwritePermissions(newRole,{
+                            VIEW_CHANNEL: true,
+                            SEND_MESSAGES: true,
+                            READ_MESSAGE_HISTORY: true,
+                        })
+                        myServer.overwritePermissions(botAdmin,{
+                            VIEW_CHANNEL: true,
+                            SEND_MESSAGES: true,
+                            READ_MESSAGE_HISTORY: true,
+                        })
+
+                        stats.setTitle(user[player].name + "s Stats")
+                        myServer.send(stats).then (async function (sentEmbed){
+          
+                            await sentEmbed.react(leftpageEmoji);
+                            await sentEmbed.react(rightpageEmoji);
+                            await sentEmbed.react(gateEmoji);
+                            CreateStats(sentEmbed,player);
+                            PlayerStatus(sentEmbed,player);
+                        });  
+                    })
                 });
-                   
-            } else {
-                message.author.send("No public instances allowed at this time.");
-                return;
-                embed.setTitle(userData[player].name + "'s instance")
-                message.channel.send(embed).then  (sentEmbed =>{
-                    CreateParty(sentEmbed);
-                })
             }
                
         }
+        message.delete();
         break;
-        //Gives information about where you are in the current dungeon, as well as gate info.
-        case 'test':{
-            Log(message);
-        }
-        break;
-        case'gate':{
-            if(userData[player].myChannel != userData[player].partyChannel){
-                message.author.send("Don't do commands in other channels!")
-                message.delete();
-                return;
-            }
-            if(userData[player].downTime > 0){
-                //console.log("You can't do anything!");
-                return;
-            }
-            if(userData[player].partyInstance === 0){
-                message.author.send("You need to create a party instance first. do !create");
-                
-                return;
-            }
-            CheckGate(player);
-            message.delete();
-        }
-        break;
-        //Move forward
-        case 'forward':{
-            if(userData[player].myChannel != userData[player].partyChannel){
-                message.author.send("Don't do commands in other channels!")
-                message.delete();
-                return;
-            }
-            if(userData[player].downTime > 0){
-                //console.log("You can't do anything!");
-                return;
-            }
-            if(userData[player].partyInstance === 0){
-                message.author.send("You need to create a party instance first. do !create");
-              
-                return;
-            }
-            Forward(player);     
-            message.delete();
-        }
-        break;
-        //Move to the next depth of the gate
-        case 'descend':{
-            if(userData[player].myChannel != userData[player].partyChannel){
-                message.author.send("Don't do commands in other channels!")
-                message.delete();
-                return;
-            }
-            if(userData[player].downTime > 0){
-                //console.log("You can't do anything!");
-                return;
-            }
-            if(userData[player].partyInstance === 0){
-                message.author.send("You need to create a party instance first. do !create");
-         
-                return;
-            }     
-            Descend(player);
-            message.delete();
-        }
-        break;
-        //Images for the bot.
+        //#endregion
+        //#region Image Resources (Admin Command)
         case 'rsrc':
             if(message.member.roles.has(myRole)){
                 message.author.send(resources);
@@ -1751,17 +2431,8 @@ bot.on('message', message=> {
             }  
             message.delete();
         break;
-        //Clears player inventory.
-        case 'clear':
-            if(message.member.roles.has(myRole)){
-                userData[player].items = {"Recruit Badge":{"name":"Recruit Badge","amount":1}};
-                message.author.send("Inventory Cleared");
-            } else {
-                message.author.send("You do not have the neccessary roles.");
-            }   
-            message.delete();
-        break;
-        //Ends the current gate and makes a new one generate.
+        //#endregion
+        //#region Force Gate Rotation(Admin Command)
         case 'force':
             if(message.member.roles.has(myRole)){
                 gate.lifeTime = 999999999;
@@ -1771,30 +2442,10 @@ bot.on('message', message=> {
             }     
             message.delete();
         break;
-        case 'money':
-            if(message.member.roles.has(myRole)){
-                userData[player].crowns += 999999999;
-                message.author.send("Rich Boy");
-            } else {
-                message.author.send("You do not have the neccessary roles.");
-            }     
-        message.delete();
-        break;
-        case 'bot':
-        if(message.member.roles.has(myRole)){
-                if(!args[1]){
-                    message.author.send("Invalid Arguments.");
-                    return;
-                }
-                var myChannel = bot.channels.get("569295829987360768");
-                myChannel.send(args);
-            } else {
-                message.author.send("You do not have the neccessary roles.");
-            }  
-            message.delete();
-        break;
+        //#endregion
+        //#region Check Item/Player/Enemy/Scenario/Room
         case 'check':
-            if (userData[player].partyChannel != message.channel.id) {
+            if (user[player].partyChannel != message.channel.id) {
                 message.author.send("Don't do commands in other channels!");
                 return;
             }
@@ -1809,12 +2460,26 @@ bot.on('message', message=> {
                     object += " ";
                 }
             }
-            //console.log("Attempting to check in the room: " + object + "!");
+            ////console.log("Attempting to check in the room: " + object + "!");
             Check(object, player);   
             message.delete();
         break;
-        
-    }  
+        //#endregion
+        //#region Peek into another player's inventory (Admin Command)
+        case 'peek':
+            if(!args[1]){
+                message.author.send("Please specify something to peek.");
+                return;
+            }
+            for(var key in user){
+                if(user[key].name === args[1]){
+                    //console.log(user[key].items);
+                }
+            }
+            message.delete();
+        break;
+        //#endregion       
+    }
     
     //All Data we need to keep track of
     SaveData();

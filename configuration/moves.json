@@ -1,0 +1,106 @@
+{ "swing":{
+    "name":"swing",
+   "type":"melee",
+   "usage":" Swing!",
+   "mist":0,
+   "properties":["damage"]
+},"spin":{
+    "name":"spin",
+    "type":"melee",
+    "multiplier":2,
+    "usage":" Tornado Spin!",
+    "mist":5,
+    "properties":["damage","heavy","cost"]
+},"block":{
+    "name":"block",
+    "type":"support",
+    "usage":" Block!",
+    "mist":3,
+    "properties":["defend","cost"]
+},"runes":{
+    "name":"runes",
+    "type":"melee",
+    "usage":" Unleash!",
+    "mist":7,
+    "properties":["any status","heavy","cost"]
+},"blast":{
+    "name":"blast",
+    "type":"ranged", 
+    "usage":" Blast!",
+    "mist":0,
+    "properties":["damage"]
+},"superblast":{
+    "name":"superblast",
+    "type":"ranged", 
+    "usage":" Super Blast!",
+    "multiplier":2,
+    "mist":4,
+    "properties":["damage","heavy","cost"]
+},"alchemer":{
+    "name":"alchemer",
+    "type":"ranged",
+    "usage":" Ricochet!",
+    "mist":6,
+    "properties":["damage","richochet","cost"]
+},"heal":{
+    "name":"heal",
+    "type":"support",
+    "usage":" Heal!",
+    "mist":8,
+    "properties":["heal","cost"]
+},"magic":{
+    "name":"magic",
+    "type":"ranged",
+    "usage":" Magic Bolt!",
+    "mist":0,
+    "properties":["damage","cost"]
+},"poke":{
+    "name":"poke",
+    "type":"melee",
+    "usage":" Poke!",
+    "mist":0,
+    "properties":["damage","light"]
+},"missile":{
+    "name":"missile",
+    "type":"ranged",
+    "usage":" Missile!",
+    "mist":8,
+    "properties":["damage","light","piercing","cost"]
+},"wave":{
+    "name":"wave",
+    "type":"ranged",
+    "usage":" Explosion Wave!",
+    "mist":6,
+    "properties":["damage","piercing","cost"]
+},"blitz":{
+    "name":"blitz",
+    "type":"ranged",
+    "usage":" Blitz!",
+    "mist":7,
+    "properties":["damage","multihit","cost"]
+},"curse":{
+    "name":"curse",
+    "type":"melee",
+    "usage":" Curse!",
+    "mist":10,
+    "properties":["damage","curse","heavy","cost"]
+},"bless":{
+    "name":"bless",
+    "type":"melee",
+    "usage":" Bless!",
+    "mist":10,
+    "properties":["damage","bless","heavy","cost"]
+},"evade":{
+    "name":"evade",
+    "type":"ranged",
+    "usage":" Evade!",
+    "mist":5,
+    "properties":["dodge","cost"]
+},"lance":{
+    "name":"lance",
+    "type":"melee",
+    "usage":" Swift Strike!",
+    "mist":5,
+    "properties":["dodge","cost"]
+}
+}

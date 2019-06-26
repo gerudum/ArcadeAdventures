@@ -1,33 +1,171 @@
-{"Basil":{
-"name":"Basil",
-"lootTable":[
-"Brandish Recipe",
-"Flourish Recipe",
-"Calibur Recipe",
-"Alchemer Recipe",
-"Blaster Recipe",
-"Autogun Recipe",
-"Needleshot Recipe",
-"Nightblade Recipe",
-"Magnus Recipe",
-"Swift Flourish Recipe",
-"Fireburst Brandish Recipe",
-"Iceburst Brandish Recipe",
-"Shockburst Brandish Recipe",
-"Elemental Blaster Recipe",
-"Shadow Blaster Recipe",
-"Pierce Blaster Recipe"],
-"lootWeights":[5,5,5,5,5,5,3,3,3,3,3,3,3,3,3,3],
-"stock":[],
-"amount":5
-},"Dangerroom1":{
-"name":"Mysterious Gate",
-"check":"This place seems kinda deadly, this pathway leads to who knows where.  Maybe we shouldn't follow it...",
-"interaction":"Going beyond the gate...",
-"spawn":"TROJAN"
-},"Greenjelly":{
-"name":"Mysterious Gate",
-"check":"Green goop is littered among the pathway. Do you dare to go in?",
-"interaction":"Going beyond the gate...",
-"spawn":"GIANT GREEN JELLY"    
-}}
+{"BASIL":{
+    "name":"Basil",
+    "health":300,
+    "buyTable":[
+    "Brandish Recipe",
+    "Flourish Recipe",
+    "Calibur Recipe",
+    "Prismatech Alchemer Recipe",
+    "Blaster Recipe",
+    "Autogun Recipe",
+    "Needleshot Recipe",
+    "Nightblade Recipe",
+    "Magnus Recipe",
+    "Swift Flourish Recipe",
+    "Fireburst Brandish Recipe",
+    "Iceburst Brandish Recipe",
+    "Shockburst Brandish Recipe",
+    "Elemental Blaster Recipe",
+    "Shadow Blaster Recipe",
+    "Pierce Blaster Recipe",
+    "Silent Nightblade Recipe",
+    "Mega Magnus Recipe",
+    "Prisma Driver Recipe",
+    "Grand Flourish Recipe",
+    "Blazebrand Recipe",
+    "Strike Needle Recipe",
+    "Callahan Recipe",
+    "Iron Slug Recipe",
+    "Blitz Needle Recipe",
+    "Combuster Recipe",
+    "Final Flourish Recipe",
+    "Nova Driver Recipe",
+    "Prismatech Alchemer 2",
+    "Acheron Recipe",
+    "Wrench Wand Recipe",
+    "Boltbrand Recipe",
+    "Voltedge Recipe",
+    "Blizzbrand Recipe",
+    "Glacius Recipe"],
+    "buyWeights":[5,5,5,5,5,5,3,3,3,3,3,3,3,3,3,3,2,2,2,2,2,2,1,1,1,1,1,1,3,1,3,3,1,3,1],
+    "stock":[],
+    "lootTable":"basil",
+    "amount":5,
+    "attackSpeed":1,
+    "turn":1,
+    "art":"https://i.imgur.com/wmxAdgc.png",
+    "damage":15,
+    "exp":200
+    },"GRASIL":{
+    "name":"Grasil",
+    "health":300,
+    "buyTable":["Autogun","Brandish","Calibur","Blaster","Alchemer","Flourish","Wrench Wand"],
+    "buyWeights":[5,5,5,5,5,5,5],
+    "stock":[],
+    "attackSpeed":1,
+    "turn":1,
+    "art":"https://i.imgur.com/wmxAdgc.png",
+    "lootTable":"grasil",
+    "damage":15,
+    "exp":200,
+    "amount":5    
+    },"DEVILISH MYSTERIOUS GATE":{
+    "name":"Devilish Mysterious Gate",
+    "check":"This place reminds you of devilites, but something seems off. Do you dare to go in?",
+    "interaction":"Going beyond the gate...",
+    "spawn":"TROJAN",
+    "activated":false
+    },"SLIMEY MYSTERIOUS GATE":{
+    "name":"Slimey Mysterious Gate",
+    "check":"Green goop is littered among the pathway. Do you dare to go in?",
+    "interaction":"Going beyond the gate...",
+    "spawn":"GIANT GREEN JELLY",
+    "activated":false    
+    },"WILD MYSTERIOUS GATE":{
+    "name":"Wild Mysterious Gate",
+    "check":"This door reminds you of wolvers, but something seems off. Do you dare to go in?",
+    "interaction":"Going beyond the gate...",
+    "spawn":"DRAGON",
+    "activated":false    
+    },"MECHANICAL MYSTERIOUS GATE":{
+    "name":"Mechanical Mysterious Gate",
+    "check":"This door seems to be sentient. Do you dare to go in?",
+    "interaction":"Going beyond the gate...",
+    "spawn":"BATTLEPOD",
+    "activated":false    
+    },"SOULLESS MYSTERIOUS GATE":{
+    "name":"Soulless Mysterious Gate",
+    "check":"This door reminds you of the afterlife. Do you dare to go in?",
+    "interaction":"Going beyond the gate...",
+    "spawn":"DEADNAUGHT",
+    "activated":false    
+    },"ANNOYING MYSTERIOUS GATE":{
+    "name":"Annoying Mysterious Gate",
+    "check":"You hear the words 'Bye Bye Billy!' in the distance. Do you dare to go in?",
+    "interaction":"Going beyond the gate...",
+    "spawn":"DEMO",
+    "activated":false    
+    },"UNKNOWN MYSTERIOUS GATE":{
+    "name":"Unknown Mysterious Gate",
+    "check":"???",
+    "interaction":"Going beyond the gate...",
+    "spawn":"GIANT GREEN JELLY",
+    "activated":false    
+    },"MYSTERIOUS OBELISK":{
+    "name":"Mysterious Obelisk",
+    "check":"A mysterious floating obsidian colored obelisk.  Its origins are unknown.",
+    "interaction":"You have touched the obelisk...",
+    "effect":"Obelisk",
+    "activated":false
+    },"MYSTERIOUS RUNES":{
+    "name":"Mysterious Runes",
+    "check":"A drawing of some sort on the ground, there's 5 locations to place an object.",
+    "interaction":"You attempted to activate the circle...",
+    "failure":"Nothing happened.",
+    "effect":"Summoning",
+    "activated":false
+    },"GOLDEN SLIME CASINO":{
+    "name":"Golden Slime Casino",
+    "check":"It's a casino!, interact to spin the wheel!",
+    "interaction":"You spun the wheel...",
+    "effect":"Golden Slime Wheel"
+    },"DEAD MECHA KNIGHT":{
+    "name":"Dead Mecha Knight",
+    "check":"An unpowered mecha knight, perhaps we could activate it.",
+    "interaction":"You activated the mecha knight!",
+    "effect":"Mecha Knight",
+    "activated":false
+    },"RUINS1":{
+    "name":"Ruins1",
+    "check":"Many fragments of what used to be a larger structure are scattered about this area.  There seems to be something hidden among one of them.",
+    "interaction":"You scavenged around in the ruins... you found a mysterious glowing rock.",
+    "effect":"Ruins1",
+    "activated":false
+    },"RUINS2":{
+    "name":"Ruins2",
+    "check":"Buried under many rock, you can see something glowing",
+    "interaction":"You dug around in the sand and rock, and found a mysterious glowing rock.",
+    "effect":"Ruins2",
+    "activated":false
+    },"RUINS3":{
+    "name":"Ruins3",
+    "check":"A derelict lumber lays in rest here, however, its eye is glowing a very vibrant golden color.",
+    "interaction":"You tried to pull out the Lumber's eye, but as you tugged on it with all your might, you are suddenly knocked back! Ancient Lumber has awoken!",
+    "spawn":"ANCIENT LUMBER",
+    "activated":false
+    },"RUINS4":{
+    "name":"Ruins4",
+    "check":"A derelict trojan lays to rest here, its sword has a glowing rock etched into it.",
+    "interaction":"You approached the Trojan, before you even had a chance to take the rock, it breaks from its slumber and takes aggression! Ancient Trojan has awoken!",
+    "spawn":"ANCIENT TROJAN",
+    "activated":false
+    },"RUINS5":{
+    "name":"Ruins5",
+    "check":"You find a large rock in the ground, surrounded by many foliage and trees, you seem to have come across an oasis.  A glowing rock is implanted on top of the large rock.",
+    "interaction":"You get on top of the rock and pull it out, as you begin to leave, the ground starts trembling and the giant rock moves. Ancient Tortodrone has awoken!",
+    "spawn":"TORTODRONE" ,
+    "activated":false
+    },"PEDESTAL":{
+    "name":"Pedestal",
+    "check":"You come across a pedestal filled with 5 holes.  Seems that something is supposed to fit in all 5 of them.",
+    "interaction":"You place all 5 rocks into each of the corresponding holes, as you back away the rocks glow and the pedestal vanishes into thin air, left before you is a golden chest, do you dare to open it?",
+    "spawn":"GOLDEN CHEST",
+    "requirement":["Ancient Fragment 1","Ancient Fragment 2","Ancient Fragment 3","Ancient Fragment 4","Ancient Fragment 5"],
+    "activated":false
+    },"GOLDEN CHEST":{
+    "name":"Golden Chest",
+    "check":"This golden chest was revealed after placing all 5 glowing rocks into the pedestal.",
+    "interaction":"You open the chest to reveal a blade wrapped in many bandages, with an eye etched on the hilt.",
+    "effect":"Golden Chest",
+    "activated":false
+    }}
