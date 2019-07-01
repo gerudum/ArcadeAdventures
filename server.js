@@ -227,7 +227,7 @@ function Gate(){
         embed.setTitle("Gate Creation")
 
         for (var key in dungeon.depth){
-            levels.push("Depth " + key + ", " + dungeon.depth[key].name);
+            levels.push("Depth " + key + ", " + dungeon.depth[key]);
         }
 
         //Levels
