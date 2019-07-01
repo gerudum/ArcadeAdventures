@@ -1547,13 +1547,26 @@ function PlayerCommands(instance,player){
                 }
                 switch(r.emoji.name){
                     case 'basic':
-                        Fight(player,"basic");
+                        try{
+                            Fight(player,"basic");
+                        } catch(e) {
+                            Log("Error fighting.  Enemy doesn't exist?");
+                        }         
                     break;
                     case 'support':
-                        Fight(player,"support");
+                        try{
+                            Fight(player,"support");
+                        } catch(e) {
+                            Log("Error fighting.  Enemy doesn't exist?");
+                        }
+                
                     break;
                     case 'charge':
-                        Fight(player,"charge");
+                        try{
+                            Fight(player,"charge");
+                        } catch(e) {
+                            Log("Error fighting.  Enemy doesn't exist?");
+                        }
                     break;         
                     case 'forward':
                         Forward(player);
