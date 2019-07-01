@@ -90,7 +90,7 @@ setInterval(function() {
 //Update is ran every second.
 function Update(){
     Gate();
-    Event();
+  //  Event();
     Mist();
 }
 function Mist(){
@@ -124,7 +124,8 @@ function Event(){
         var depth = Math.floor(Math.random() * maxDepth);
         dungeon.depth[depth] = {};
         var chosenArea = null;
-        //Step 2 Generate a New Dungeon
+
+        //Step 2 Generate a New Dungeon.
         chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
         while(!dungeons[chosenArea].theme.includes(gate.theme[0]) && !dungeons[chosenArea].theme.includes(gate.theme[1])){
             //console.log(chosenArea);
@@ -135,19 +136,24 @@ function Event(){
         enemies.depth[depth].location = {};
         dungeon.depth[depth] = GenerateDungeon(chosenArea);
 
-        //Step 3 Set up the enemies
+        //Step 3 Set up the enemies.
         for (var i = 0; i < dungeon.depth[depth].currentrooms.length; i++){ 
             enemies.depth[depth].location[i] = {};   
             enemies.depth[depth].location[i].enemy = {};
             enemies.depth[depth].location[i].enemy.health = 0;
         }
-        //Step 4 Make sure players are in the right location
+
+        //Step 4 Make sure players are in the right location.
         for(var key in user){
             if(user[key].depth === depth){
                 user[key].location = 0;
             }
         }
+
+        //Get Channel and send it.
         var channel = bot.channels.get("579858992814358528");
+
+        //Embed.
         const embed = new Discord.RichEmbed()
         embed.setTitle("Event!")
         embed.addField("Depth " + depth + " has become " + dungeon.depth[depth].name + "!","The clockworks is always changing...")
@@ -157,68 +163,74 @@ function Event(){
 }
 //Runs every second. For gates.
 function Gate(){
+    //Gate regeneration time;
     gate.lifeTime += 1;
     gate.maxLife = 14400;
+
     if(gate.lifeTime > gate.maxLife){
         gate.lifeTime = 0;
       if(!gate.minerals){
         gate.minerals = {}
       }
+
+        //Get the New Theme of the Gate based on minerals
         var newTheme = GetTheme();
         gate.theme = newTheme;
-        //console.log(newTheme);
-        gate.minerals["CRIMSONITE"] = 0;
-        gate.minerals["DARK MATTER"] = 0;
-        gate.minerals["LUMINITE"] = 0;
-        gate.minerals["VALESTONE"] = 0;
-        gate.minerals["MOONSTONE"] = 0;
-        gate.minerals["DREAMSTONE"] = 0;
-       //newTheme = ["none","random"];
-      
-        Log("A new gate is being generated.")
+
+        //Clear all the depths
         dungeon.depth = {};
+
+        //Reset Depths
         for(var i = 0; i < maxDepth; i++){
             dungeon.depth[i] = {};
         }    
-        enemies.depth = {};
+
         var chosenArea = null;
+
         for (var key in dungeon.depth){        
             chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
             while(!dungeons[chosenArea].theme.includes(newTheme[0]) && !dungeons[chosenArea].theme.includes(newTheme[1])){
                 //console.log(chosenArea);
                 chosenArea = CreateLoot(dungeons["Config"].names,dungeons["Config"].weights);
             }               
-            
-            enemies.depth[key] = {};
-            enemies.depth[key].location = {};
-            dungeon.depth[key] = GenerateDungeon(chosenArea);
- 
-            for (var i = 0; i < dungeon.depth[key].currentrooms.length; i++){ 
-                enemies.depth[key].location[i] = {};   
-                enemies.depth[key].location[i].enemy = {};
-                enemies.depth[key].location[i].enemy.health = 0;
-            }
+
+            //Set the name
+            //The party will generate said dungeon 
+
+            dungeon.depth[key] = chosenArea;
            
         } 
+
+        //Reset Minerals
         for (var key in gate.minerals){
             gate.minerals[key] = 0;
         }
+        
+        //Reset User Stats
         for(var key in user) {
+
             user[key].enemy = null;
             user[key].health = user[key].maxHealth;
             user[key].opponent = "Nothing";
             user[key].location = 0;
             user[key].downTime = false;
             user[key].depth = 0;
+            
         } 
+
+        //Get the channel
         var channel = bot.channels.get("579858992814358528");
         var levels = [];
+
+        //Embed
         const embed = new Discord.RichEmbed()
         embed.setTitle("Gate Creation")
-        //embed.setThumbnail("https://i.imgur.com/KTD2rHD.png")
+
         for (var key in dungeon.depth){
             levels.push("Depth " + key + ", " + dungeon.depth[key].name);
         }
+
+        //Levels
         var stratum1 = [levels[0],levels[1],levels[2],levels[3]];
         var stratum2 = [levels[4],levels[5],levels[6],levels[7]];
         var stratum3 = [levels[8],levels[9],levels[10],levels[11],levels[12]];
@@ -228,6 +240,7 @@ function Gate(){
         var stratum7 = [levels[28],levels[29],levels[30],levels[31],levels[32]];
         var stratum8 = [levels[33],levels[34],levels[35],levels[36],levels[37]];
 
+        //Stratums
         embed.addField("Stratum 1", stratum1)
         embed.addField("Stratum 2", stratum2)
         embed.addField("Stratum 3", stratum3)
@@ -237,28 +250,26 @@ function Gate(){
         embed.addField("Stratum 7", stratum7)
         embed.addField("Stratum 8", stratum8)
         embed.addField("The theme is " + gate.theme[0] + " " + gate.theme[1],"Interesting")
+
         embed.setColor(0xFCF200)
+
         channel.send(embed);
+
+         //Log it
+         Log("A new gate has been generated.")
     }
 }
 //Check Gate Map
 function CheckGate(player){
+    //Log it
     Log(user[player].name + " is checking the gate.");
-    var players = [];
-    var yourEnemy = enemies.depth[user[player].depth].location[user[player].location].enemy;
-    for(var key in user){
-        if(user[key].location === user[player].location && user[key].name != user[player].name && user[key].depth === user[player].depth){
-            players.push(user[key].name)
-        }
-    }
-    if(players.length === 0){
-        players.push("nobody");
-    }
-
     var levels = [];
+
         for (var key in dungeon.depth){
             levels.push("Depth " + key + ", " + dungeon.depth[key].name);    
         }
+
+        //Stratums
         var stratum1 = [levels[0],levels[1],levels[2],levels[3]];
         var stratum2 = [levels[4],levels[5],levels[6],levels[7]];
         var stratum3 = [levels[8],levels[9],levels[10],levels[11],levels[12]];
@@ -268,22 +279,25 @@ function CheckGate(player){
         var stratum7 = [levels[28],levels[29],levels[30],levels[31],levels[32]];
         var stratum8 = [levels[33],levels[34],levels[35],levels[36],levels[37]];
         
-    var minerals = [];
+        //Minerals
+        var minerals = [];
         for (var key in gate.minerals){
             minerals.push(key  + ": " + gate.minerals[key]);
         }
-
+    //Embed
     const embed = new Discord.RichEmbed()
+
         embed.setTitle("Gate")
-        embed.addField("The current dungeon is " + dungeon.depth[user[player].depth].name, "You have reached room " + (user[player].location + 1) + " out of " + dungeon.depth[user[player].depth].currentrooms.length + " of this dungeon.")
-        if(yourEnemy != null){
-            embed.addField("You are currently facing off against " + yourEnemy.name , "It has " + yourEnemy.health + " health remaining.")
-        }
+        embed.addField("The current dungeon is " + party[user].dungeon.name, "You have reached room " + (user[player].location + 1) + " out of " + party[user].dungeon.currentrooms.length + " of this dungeon.")
+
         embed.addField("You are at depth: " + user[player].depth + " of the current gate", "You have quite a ways to go.")
-        embed.addField("There is " + Math.floor((gate.maxLife - gate.lifeTime)/60) + " minutes remaining before the next gate", "You are with " + players)
+        embed.addField("There is " + Math.floor((gate.maxLife - gate.lifeTime)/60) + " minutes remaining before the next gate", "Interesting")
+        
         if(minerals.length <= 0){
             minerals.push("None, be the first to input minerals!");
         } 
+
+        //Minerals and Stratums, Embed
         embed.addField("Deposited minerals", minerals)
         embed.addField("Stratum 1", stratum1)
         embed.addField("Stratum 2", stratum2)
@@ -295,11 +309,13 @@ function CheckGate(player){
         embed.addField("Stratum 6", stratum8)
         embed.addField("The theme is " + gate.theme[0] + " " + gate.theme[1],"Interesting")
         //embed.setThumbnail("https://i.imgur.com/KTD2rHD.png")
-    StatusAction(embed,player);
+        //Update Embed
+        StatusAction(embed,player);
 }
 //Get theme of the gate.
 function GetTheme(){
     //Get the minerals
+    //Get the Themes
     var crimsonite = gate.minerals["CRIMSONITE"];
     var darkmatter = gate.minerals["DARK MATTER"];
     var luminite = gate.minerals["LUMINITE"];
@@ -1068,15 +1084,18 @@ function ScaleHealth(enemy,player){
 }
 function Forward(player){
     var embed = new Discord.RichEmbed()
+
     if(user[player].downTime){
         embed.setTitle("You are dead, consider restarting the run?")
         PartyAction(embed,player);
         return;
     }
+
     var depth = user[player].depth;
     var location = user[player].location;
     var enemy = party[user[player].party].enemies[user[player].opponent];
 
+    //Enemy is still here, must kill it first.
     if(enemy != null){
        if(enemy.health > 0 && !enemy.stock){
         embed.addField("You must kill the enemy in this area first, try hitting fight.","Fight fight fight")
@@ -1087,22 +1106,29 @@ function Forward(player){
 
     location += 1;
 
-    if(dungeon.depth[depth].currentrooms.length <= location){
+    //Reached the end of the dungeon
+    if(party[user].dungeon.currentrooms.length <= location){
+        //Embed
         const embed = new Discord.RichEmbed()
-        location = dungeon.depth[depth].currentrooms.length
+        //Update location;
+        location = party[user].dungeon.currentrooms.length;
+    
         embed.setTitle(user[player].name + " is moving forward! ")
         embed.addField(user[player].name + " has reached the end of this dungeon inside of room " + (user[player].location) + "!", "You'll have to descend to move any further.")
         embed.setFooter(user[player].name)
+
+        //Update the party
         PartyAction(embed,player);
-        user[player].location = dungeon.depth[user[player].depth].currentrooms.length - 1;
+        //Fix up location, don't want the player moving on forever.
+        user[player].location = party[user].dungeon.currentrooms.length - 1;
         return;
     }
 
     var newMob;
-    if(rooms[dungeon.depth[depth].currentrooms[location]].monster){
-        newMob = rooms[dungeon.depth[depth].currentrooms[location]].monster;
+    if(rooms[party[user].dungeon.currentrooms[location]].monster){
+        newMob = rooms[party[user].dungeon.currentrooms[location]].monster;
     } else {
-        newMob = rooms[dungeon.depth[depth].currentrooms[location]].scenario;
+        newMob = rooms[party[user].dungeon.currentrooms[location]].scenario;
     }
 
     var newEnemy;
@@ -1145,47 +1171,75 @@ function Forward(player){
    
     user[player].depth = depth;
     user[player].location = location;
+
+    //Embed Update
     embed.addField("You have encountered " + newEnemy.name + " inside of room " + user[player].location + "!","Get ready for a fight.")
     //embed.setThumbnail(newEnemy.art)
+    //Disabled artwork to improve performance.
+
+    //Update Instance
     PartyAction(embed,player);
+    //Log it.
     Log(user[player].name + " is attempting to move forward!")
 }
 function Descend(player){
+
     var embed = new Discord.RichEmbed()
+
     Log(user[player].name +  " is attempting to descend!")
+
+    //Dead
     if(user[player].downTime){
         embed.setTitle("You are dead, consider restarting the run?")
         PartyAction(embed,player);
         return;
     }
-    if(user[player].depth === maxDepth && dungeon.depth[user[player].depth].currentrooms.length - 1 <= user[player].location){
+    
+    //Reached the end of the game.
+    if(user[player].depth === maxDepth - 1 && party[user].currentrooms.length - 1 <= user[player].location){
         embed.setTitle("Congratulations, you have reached the end of this gate, consider restarting the run?")
         PartyAction(embed,player);
         return;
     }
-    if(dungeon.depth[user[player].depth].currentrooms.length - 1 <= user[player].location){
+
+
+    if(party[user].dungeon.length - 1 <= user[player].location){
+        //Increase Depth reset to room 0.
         user[player].location = 0;
         user[player].depth += 1;
 
+        //Bonus Prize
         var bonusPrize = CreateLoot(table.bonus.loot,table.bonus.weights);
         AddItem(bonusPrize,player);
         
+        //Generate new dungeon
+        party[user].dungeon = GenerateDungeon(dungeon.depth[user[player].depth]);
+
+        //Embed
         const embed = new Discord.RichEmbed()
         embed.setTitle(user[player].name + " is descending to depth " + user[player].depth + "...")
-        embed.addField(user[player].name + " has reached " + dungeon.depth[user[player].depth].name + " and is inside of room " + (user[player].location + 1) + " of the dungeon!", "Get ready for an adventure!")
+        embed.addField(user[player].name + " has reached " + party[user].dungeon.name + " and is inside of room " + (user[player].location + 1) + " of the dungeon!", "Get ready for an adventure!")
         embed.addField(user[player].name + " has earned a bonus prize of " + bonusPrize , "Congratulations!")
-        //.setThumbnail(dungeon.depth[user[player].depth].art)
         embed.setFooter(user[player].name)
+
+        //.setThumbnail(dungeon.depth[user[player].depth].art)
+
+        //Update Party Action
         PartyAction(embed,player);
     } else {
+        //Embed
         const embed = new Discord.RichEmbed()
         embed.setTitle(user[player].name + " is descending... ")
         embed.addField(user[player].name + " you cannot descend right now, reach the end of the dungeon.")
+
+        //Update Party Action
         PartyAction(embed,player);
     }
 }
 function Inventory(player){
     Log(user[player].name + " is checking their inventory.");
+
+    //Need a party instance to use inventory.
     if(user[player].partyInstance === 0){
         return;
     }  
@@ -1199,6 +1253,8 @@ function Inventory(player){
         var minerals = [];
         var trinkets = [];
         var rarity = [];
+
+        //Set the inventory.
         for(var key in user[player].items) {
             if(user[player].items[key].amount > 0){
                 if(items[key].type === "Material"){
@@ -1219,6 +1275,7 @@ function Inventory(player){
                 ////console.log(user[player].items[key])
             }  
         }
+        //If nothing is in this section, push nothing to avoid errors.
         if(materials.length === 0){
             materials.push("Nothing");
         }
@@ -1241,6 +1298,7 @@ function Inventory(player){
             rarity.push("Nothing");
         }
 
+        //Sort them out, alphabetically.
         materials.sort();
         usables.sort();
         weapons.sort();
@@ -1252,6 +1310,7 @@ function Inventory(player){
         inv.setTitle(user[player].name + "'s Inventory")
         inv.addField('Crowns', user[player].crowns)
         //inv.addField('Energy', user[player].energy)
+        //Pages to prevent image overflowing.
         switch(user[player].page){
             case 0:
                 inv.addField('Page 0 Weapons', weapons)  
