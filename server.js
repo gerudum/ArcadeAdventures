@@ -210,14 +210,23 @@ function Gate(){
         for(var key in user) {
 
             user[key].enemy = null;
+
             user[key].health = user[key].maxHealth;
-            user[key].opponent = "Nothing";
-            user[key].location = 0;
+            
             user[key].downTime = false;
+
+            user[key].opponent = "Nothing";
+
+            user[key].location = 0;
             user[key].depth = 0;
+
+            //Try 
             try{
+                
+                party[user[player].party].enemies[user[player].opponent] = {};
                 party[user[key].party].dungeon = {};
                 party[user[key].party].dungeon = GenerateDungeon(dungeon.depth[user[key].depth]);
+                
                 console.log("Dungeon Instantiation Successful! " + "Dungeon Name: " + party[user[key].party].dungeon.name + "Current Rooms: " + party[user[key].party].dungeon.currentrooms);
             } catch(e) {
                 console.log("Dungeon Instantiation failed");
@@ -696,11 +705,14 @@ function Interact(room,player){
     }
     PartyAction(interaction,player);
 }
+
+//Enemy Loot
 function EnemyLoot(enemy,player,embed){
     var results = {};
     for(var key in user){
         if(user[key].party === user[player].party && user[key].location === user[player].location && user[key].depth === user[player].depth){
             var rewards = [];
+            console.log(enemy.lootTable);
             var drop = CreateLoot(table[enemy.lootTable].loot,table[enemy.lootTable].weights);
             AddItem(drop,key);
             
@@ -728,6 +740,8 @@ function EnemyLoot(enemy,player,embed){
     results.embed = embed;
     return results;
 }
+
+//Take Damage
 function TakeDamage(source,target,embed){
     var results = {};
     target.health -= source;
@@ -740,6 +754,8 @@ function TakeDamage(source,target,embed){
     results.source = source;
     return results;
 }
+
+//Apply Status Effects
 function Status(embed,victim,damage){
     var result = {};
     result.canAttack = true;
@@ -797,6 +813,8 @@ function Status(embed,victim,damage){
     result.victim = victim;
     return result;
 }
+
+//Trinkets
 function Trinket(player,damage){
     var trinket = user[player].trinket;
     switch(trinket.type){
@@ -811,6 +829,8 @@ function Trinket(player,damage){
         break;
     }
 }
+
+//Get Moveset
 function GetMove(weapon, move){
     switch(move){
         case "basic":
@@ -821,11 +841,13 @@ function GetMove(weapon, move){
             return weapon.charge;
     }
 }
+
 function Fight(player, move = "basic"){
     Log(user[player].name + " is fighting!")
     //Referencing Enemy and our Weapon
     var embed = new Discord.RichEmbed();
     var enemy = party[user[player].party].enemies[user[player].opponent];
+
     ////console.log(enemy);
     var weapon = user[player].equipment[user[player].equipped];
     var damage = weapon.damage;
@@ -833,12 +855,15 @@ function Fight(player, move = "basic"){
     if(weapon.damage <= 0){
         weapon.damage = 1;
     }
+
     if(user[player].health === null){
         if(user[player].maxHealth === null){
             user[player].maxHealth = 20;
         }
         user[player].health = user[player].maxHealth;
     }
+
+    //Enemy
     if(enemy === null){
         embed.setTitle("No enemy here to attack.")
         PartyAction(embed,player);
@@ -848,12 +873,16 @@ function Fight(player, move = "basic"){
         PartyAction(embed,player);
         return;
     }
+
+    //Dead
     if(user[player].downTime){
         embed.setTitle("You are dead, consider restarting the run?")
         PartyAction(embed,player);
         return;
     }
     var canAttack = true;
+
+    //Enough mist to use the attack?
     var enoughMist = true;
     if(user[player].status != null){
         var playerStatus = Status(embed,user[player],weapon.damage);
@@ -1010,6 +1039,8 @@ function Fight(player, move = "basic"){
     StatusAction(stats,player);
     
 }
+
+//Additem to player inventory
 function AddItem(item, player, amount = 0){ 
     if(items[item]){
         if(!user[player].items[items[item].name]){
@@ -1034,6 +1065,7 @@ function AddItem(item, player, amount = 0){
         Log(user[player].name + " has obtained " + item); 
     } 
 }
+
 //Buying Items
 function Buy(target,player){
     //Log Items
