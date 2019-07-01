@@ -244,7 +244,7 @@ function Gate(){
 
         //Depth Dungeon
         for (var key in dungeon.depth){
-            levels.push("Depth " + key + ", " + dungeon.depth[key]);
+            levels.push("Depth " + key + ", " + dungeons[dungeon.depth[key]].name);
         }
 
         //Levels
@@ -1559,7 +1559,6 @@ function PlayerCommands(instance,player){
                         } catch(e) {
                             Log("Error fighting.  Enemy doesn't exist?");
                         }
-                
                     break;
                     case 'charge':
                         try{
