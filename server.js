@@ -226,7 +226,7 @@ function Gate(){
                 party[user[player].party].enemies[user[player].opponent] = {};
                 party[user[key].party].dungeon = {};
                 party[user[key].party].dungeon = GenerateDungeon(dungeon.depth[user[key].depth]);
-                
+                f
                 console.log("Dungeon Instantiation Successful! " + "Dungeon Name: " + party[user[key].party].dungeon.name + "Current Rooms: " + party[user[key].party].dungeon.currentrooms);
             } catch(e) {
                 console.log("Dungeon Instantiation failed");
@@ -1177,6 +1177,8 @@ function Forward(player){
         return;
     }
 
+
+    //Get the enemy that's supposed to be in this room
     var newMob;
     if(rooms[party[user[player].party].dungeon.currentrooms[location]].monster){
         newMob = rooms[party[user[player].party].dungeon.currentrooms[location]].monster;
@@ -1184,6 +1186,7 @@ function Forward(player){
         newMob = rooms[party[user[player].party].dungeon.currentrooms[location]].scenario;
     }
 
+    //Instantiate new monster
     var newEnemy;
     if(monsters[newMob]){
 
@@ -1222,6 +1225,7 @@ function Forward(player){
     user[player].opponent = newEnemy.name.toUpperCase();
     party[user[player].party].enemies[user[player].opponent] = newEnemy;
    
+    //Depths and Location
     user[player].depth = depth;
     user[player].location = location;
 
@@ -1232,6 +1236,7 @@ function Forward(player){
 
     //Update Instance
     PartyAction(embed,player);
+
     //Log it.
     Log(user[player].name + " is attempting to move forward!")
 }
@@ -1239,6 +1244,7 @@ function Descend(player){
 
     var embed = new Discord.RichEmbed()
 
+    //Log
     Log(user[player].name +  " is attempting to descend!")
 
     //Dead
@@ -1256,7 +1262,7 @@ function Descend(player){
     }
 
 
-    if(party[user[player].party].dungeon.length - 1 <= user[player].location){
+    if(party[user[player].party].dungeon.currentrooms.length - 1 <= user[player].location){
         //Increase Depth reset to room 0.
         user[player].location = 0;
         user[player].depth += 1;
@@ -1297,6 +1303,7 @@ function Inventory(player){
         return;
     }  
 
+    //Inventory
     const inv = new Discord.RichEmbed() 
     
         var materials = [];
