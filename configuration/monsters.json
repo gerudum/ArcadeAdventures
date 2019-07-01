@@ -1,5 +1,5 @@
 {"SLIME":{
-    "name":"Slime",
+    "name":"SLIME",
     "health":10,
     "max":10,
     "damage":2,
@@ -9,7 +9,7 @@
     "turn":2,
     "art":"https://i.imgur.com/daHaUG3.png",
     "exp":10,
-    "lootTable":"slime",
+    "lootTable":"SLIME",
     "location":0,
     "depth":0 
     },"LICHEN":{
@@ -23,7 +23,7 @@
         "turn":2,
         "art":"https://i.imgur.com/VXRNVTG.png",
         "exp":14,
-        "lootTable":"slime",
+        "lootTable":"SLIME",
         "location":0,
         "depth":0  
     },"POLYP":{
@@ -37,7 +37,7 @@
         "turn":1,
         "art":"https://i.imgur.com/daHaUG3.png",
         "exp":10,
-        "lootTable":"slime",
+        "lootTable":"SLIME",
         "location":0,
         "depth":0  
     },"GIANT LICHEN":{
@@ -51,7 +51,7 @@
         "turn":3,
         "art":"https://i.imgur.com/tCXUiaA.png",
         "exp":35,
-        "lootTable":"slime",
+        "lootTable":"SLIME",
         "location":0,
         "depth":0   
     },"JELLY KING":{
@@ -65,7 +65,7 @@
         "turn":4,
         "art":"https://i.imgur.com/daHaUG3.png",
         "exp":100,
-        "lootTable":"slime",
+        "lootTable":"SLIME",
         "location":0,
         "depth":0   
     },"GIANT GREEN JELLY":{
@@ -79,7 +79,7 @@
         "turn":3,
         "art":"https://i.imgur.com/pshD5Dp.png",
         "exp":90,
-        "lootTable":"slime",
+        "lootTable":"SLIME",
         "location":0,
         "depth":0 
     },"SCUTTLEBOT":{
@@ -93,7 +93,7 @@
         "turn":2,
         "art":"https://i.imgur.com/StinhW6.png",
         "exp":12,
-        "lootTable":"construct",
+        "lootTable":"CONSTRUCT",
         "location":0,
         "depth":0  
     },"RETRODE":{
@@ -107,7 +107,7 @@
         "turn":3,
         "art":"https://i.imgur.com/StinhW6.png",
         "exp":15,
-        "lootTable":"construct",
+        "lootTable":"CONSTRUCT",
         "location":0,
         "depth":0  
     },"LUMBER":{
@@ -121,7 +121,7 @@
         "turn":4,
         "art":"https://i.imgur.com/SCiqDEY.png",
         "exp":30,
-        "lootTable":"construct",
+        "lootTable":"CONSTRUCT",
         "location":0,
         "depth":0  
     },"GUNPUPPY":{
@@ -135,7 +135,7 @@
         "turn":2,
         "art":"https://i.imgur.com/x6Ygbqd.png",
         "exp":12,
-        "lootTable":"construct",
+        "lootTable":"CONSTRUCT",
         "location":0,
         "depth":0  
     },"DEVILITE":{
@@ -149,7 +149,7 @@
         "turn":2,
         "art":"https://i.imgur.com/ujd3Jr5.png",
         "exp":15,
-        "lootTable":"fiend",
+        "lootTable":"FIEND",
         "location":0,
         "depth":0 
     },"OVERTIMER":{
@@ -163,7 +163,7 @@
         "turn":3,
         "art":"https://i.imgur.com/ujd3Jr5.png",
         "exp":15,
-        "lootTable":"fiend",
+        "lootTable":"FIEND",
         "location":0,
         "depth":0 
     },"WOLVER":{
@@ -177,7 +177,7 @@
         "turn":2,
         "art":"https://i.imgur.com/1RHk2G3.png",
         "exp":15,
-        "lootTable":"beast",
+        "lootTable":"BEAST",
         "location":0,
         "depth":0 
     },"CHROMALISK":{
@@ -191,7 +191,7 @@
         "turn":3,
         "art":"https://i.imgur.com/Ot37ETu.png",
         "exp":15,
-        "lootTable":"beast",
+        "lootTable":"BEAST",
         "location":0,
         "depth":0 
     },"ALPHA WOLVER":{
@@ -205,7 +205,7 @@
         "turn":3,
         "art":"https://i.imgur.com/pudlHdt.png",
         "exp":25,
-        "lootTable":"beast",
+        "lootTable":"BEAST",
         "location":0,
         "depth":0 
     },"TROJAN":{
@@ -219,7 +219,7 @@
         "turn":4,
         "art":"https://i.imgur.com/jq5zOI7.png",
         "exp":50,
-        "lootTable":"fiend",
+        "lootTable":"FIEND",
         "location":0,
         "depth":0 
     },"TREASURE":{
@@ -317,7 +317,7 @@
         "turn":3,
         "art":"https://i.imgur.com/1OO2avZ.png",
         "exp":15,
-        "lootTable":"gremlin",
+        "lootTable":"s",
         "location":0,
         "depth":0 
     },"DEMO":{
@@ -331,7 +331,7 @@
         "turn":4,
         "art":"https://i.imgur.com/92PaqQ8.png",
         "exp":50,
-        "lootTable":"gremlin",
+        "lootTable":"GREMLIN",
         "location":0,
         "depth":0 
     },"SCORCHER":{
@@ -345,7 +345,7 @@
         "turn":4,
         "art":"https://i.imgur.com/92PaqQ8.png",
         "exp":50,
-        "lootTable":"gremlin",
+        "lootTable":"GREMLIN",
         "location":0,
         "depth":0 
     },"ZOMBIE":{
@@ -359,7 +359,7 @@
         "turn":4,
         "art":"https://i.imgur.com/foHwvzi.png",
         "exp":20,
-        "lootTable":"undead",
+        "lootTable":"UNDEAD",
         "location":0,
         "depth":0 
     },"SPOOKAT":{
@@ -373,7 +373,7 @@
         "turn":3,
         "art":"https://i.imgur.com/dC5IQsl.png",
         "exp":19,
-        "lootTable":"undead",
+        "lootTable":"UNDEAD",
         "location":0,
         "depth":0 
     },"HOWLITZER":{
@@ -387,7 +387,7 @@
         "turn":2,
         "art":"https://i.imgur.com/foHwvzi.png",
         "exp":50,
-        "lootTable":"undead",
+        "lootTable":"UNDEAD",
         "location":0,
         "depth":0 
     },"DEADNAUGHT":{
@@ -401,7 +401,7 @@
         "turn":4,
         "art":"https://i.imgur.com/foHwvzi.png",
         "exp":100,
-        "lootTable":"undead",
+        "lootTable":"UNDEAD",
         "location":0,
         "depth":0 
     } ,"GREAVER":{
@@ -415,7 +415,7 @@
         "turn":3,
         "art":"https://i.imgur.com/ujd3Jr5.png",
         "exp":19,
-        "lootTable":"fiend",
+        "lootTable":"FIEND",
         "location":0,
         "depth":0 
     } ,"ANCIENT TROJAN":{
@@ -499,7 +499,7 @@
         "turn":2,
         "art":"https://i.imgur.com/foHwvzi.png",
         "exp":5,
-        "lootTable":"undead",
+        "lootTable":"UNDEAD",
         "location":0,
         "depth":0 
     },"GOLDEN CHEST":{

@@ -215,7 +215,14 @@ function Gate(){
             user[key].location = 0;
             user[key].downTime = false;
             user[key].depth = 0;
-            
+            try{
+                party[user[key].party].dungeon = {};
+                party[user[key].party].dungeon = GenerateDungeon(dungeon.depth[user[key].depth]);
+                console.log("Dungeon Instantiation Successful! " + "Dungeon Name: " + party[user[key].party].dungeon.name + "Current Rooms: " + party[user[key].party].dungeon.currentrooms);
+            } catch(e) {
+                console.log("Dungeon Instantiation failed");
+            }
+           
         } 
 
         //Get the channel
@@ -226,6 +233,7 @@ function Gate(){
         const embed = new Discord.RichEmbed()
         embed.setTitle("Gate Creation")
 
+        //Depth Dungeon
         for (var key in dungeon.depth){
             levels.push("Depth " + key + ", " + dungeon.depth[key]);
         }
@@ -288,7 +296,7 @@ function CheckGate(player){
     const embed = new Discord.RichEmbed()
 
         embed.setTitle("Gate")
-        embed.addField("The current dungeon is " + party[user].dungeon.name, "You have reached room " + (user[player].location + 1) + " out of " + party[user].dungeon.currentrooms.length + " of this dungeon.")
+        embed.addField("The current dungeon is " + party[user[player].party].dungeon.name, "You have reached room " + (user[player].location + 1) + " out of " + party[user[player].party].dungeon.currentrooms.length + " of this dungeon.")
 
         embed.addField("You are at depth: " + user[player].depth + " of the current gate", "You have quite a ways to go.")
         embed.addField("There is " + Math.floor((gate.maxLife - gate.lifeTime)/60) + " minutes remaining before the next gate", "Interesting")
@@ -1026,7 +1034,9 @@ function AddItem(item, player, amount = 0){
         Log(user[player].name + " has obtained " + item); 
     } 
 }
+//Buying Items
 function Buy(target,player){
+    //Log Items
     Log(user[player].name + " is attempting to buy an item!")
     if(user[player].crowns >= items[target].crowns){
         user[player].crowns -= items[target].crowns;
@@ -1043,6 +1053,8 @@ function Buy(target,player){
         PartyAction(embed,player);
     }  
 }
+
+//Stock Merchants/NPCS
 function Stock(enemy){
     for(var i = 0; i < enemy.amount; i++){
         var newItem = CreateLoot(enemy.buyTable,enemy.buyWeights);
@@ -1053,6 +1065,8 @@ function Stock(enemy){
     }
     return enemy;
 }
+
+//Health Scaling
 function ScaleHealth(enemy,player){
     var newHealth = enemy.max;
     if(user[player].depth >= 0 && user[player].depth < 5){
@@ -1084,15 +1098,21 @@ function ScaleHealth(enemy,player){
 }
 function Forward(player){
     var embed = new Discord.RichEmbed()
+    
+   // party[user[player].party].dungeon = {};
 
+   //Are you dead? You're not allowed to move forward.
     if(user[player].downTime){
         embed.setTitle("You are dead, consider restarting the run?")
         PartyAction(embed,player);
         return;
     }
 
+    //Get Depth and Location to make this easier to read.
     var depth = user[player].depth;
     var location = user[player].location;
+
+    //Get the enemy
     var enemy = party[user[player].party].enemies[user[player].opponent];
 
     //Enemy is still here, must kill it first.
@@ -1104,14 +1124,15 @@ function Forward(player){
       }
     }
 
+    //Location
     location += 1;
 
     //Reached the end of the dungeon
-    if(party[user].dungeon.currentrooms.length <= location){
+    if(party[user[player].party].dungeon.currentrooms.length <= location){
         //Embed
         const embed = new Discord.RichEmbed()
         //Update location;
-        location = party[user].dungeon.currentrooms.length;
+        location = party[user[player].party].dungeon.currentrooms.length;
     
         embed.setTitle(user[player].name + " is moving forward! ")
         embed.addField(user[player].name + " has reached the end of this dungeon inside of room " + (user[player].location) + "!", "You'll have to descend to move any further.")
@@ -1120,15 +1141,15 @@ function Forward(player){
         //Update the party
         PartyAction(embed,player);
         //Fix up location, don't want the player moving on forever.
-        user[player].location = party[user].dungeon.currentrooms.length - 1;
+        user[player].location = party[user[player].party].dungeon.currentrooms.length - 1;
         return;
     }
 
     var newMob;
-    if(rooms[party[user].dungeon.currentrooms[location]].monster){
-        newMob = rooms[party[user].dungeon.currentrooms[location]].monster;
+    if(rooms[party[user[player].party].dungeon.currentrooms[location]].monster){
+        newMob = rooms[party[user[player].party].dungeon.currentrooms[location]].monster;
     } else {
-        newMob = rooms[party[user].dungeon.currentrooms[location]].scenario;
+        newMob = rooms[party[user[player].party].dungeon.currentrooms[location]].scenario;
     }
 
     var newEnemy;
@@ -1196,14 +1217,14 @@ function Descend(player){
     }
     
     //Reached the end of the game.
-    if(user[player].depth === maxDepth - 1 && party[user].currentrooms.length - 1 <= user[player].location){
+    if(user[player].depth === maxDepth - 1 && party[user[player].party].currentrooms.length - 1 <= user[player].location){
         embed.setTitle("Congratulations, you have reached the end of this gate, consider restarting the run?")
         PartyAction(embed,player);
         return;
     }
 
 
-    if(party[user].dungeon.length - 1 <= user[player].location){
+    if(party[user[player].party].dungeon.length - 1 <= user[player].location){
         //Increase Depth reset to room 0.
         user[player].location = 0;
         user[player].depth += 1;
@@ -1213,12 +1234,12 @@ function Descend(player){
         AddItem(bonusPrize,player);
         
         //Generate new dungeon
-        party[user].dungeon = GenerateDungeon(dungeon.depth[user[player].depth]);
+        party[user[player].party].dungeon = GenerateDungeon(dungeon.depth[user[player].depth]);
 
         //Embed
         const embed = new Discord.RichEmbed()
         embed.setTitle(user[player].name + " is descending to depth " + user[player].depth + "...")
-        embed.addField(user[player].name + " has reached " + party[user].dungeon.name + " and is inside of room " + (user[player].location + 1) + " of the dungeon!", "Get ready for an adventure!")
+        embed.addField(user[player].name + " has reached " + party[user[player].party].dungeon.name + " and is inside of room " + (user[player].location + 1) + " of the dungeon!", "Get ready for an adventure!")
         embed.addField(user[player].name + " has earned a bonus prize of " + bonusPrize , "Congratulations!")
         embed.setFooter(user[player].name)
 
@@ -1531,21 +1552,25 @@ function PlayerCommands(instance,player){
 }
 //Restart said Instance
 function RebootInstance(player){
+  
     //If the player had a party instance and a channel after a reboot.
     //Reactivate the reaction collectors.
     if(!user[player].partyChannel || !user[player].party){
       return;
     }
+  
     var thechannel = bot.channels.get(user[player].partyChannel); 
     var thestatschannel = bot.channels.get(user[player].statsChannel);
-    var theadminchannel;
+
     if(admin[player]){
-      theadminchannel = bot.channels.get(admin[player].boardChannel);
-      if(admin[player].board != null){
-          theadminchannel.fetchMessage(admin[player].board).then ( instance =>{      
+      try {
+        var theadminchannel = bot.channels.get(admin[player].boardChannel);
+        theadminchannel.fetchMessage(admin[player].board).then ( instance =>{      
           //console.log("Rebooting Board");
           AdminDashboard(instance,player);                
         });  
+      } catch(e){
+        console.log("Admin Reboot Failed, probably doesn't exist.");
       }
     }
   
@@ -1554,6 +1579,7 @@ function RebootInstance(player){
       //console.log("Rebooting Instance");
       PlayerCommands(instance,player);                
     }); 
+      
     if(user[player].stats != null){
         thestatschannel.fetchMessage(user[player].stats).then ( instance =>{      
         //console.log("Rebooting Stats");
